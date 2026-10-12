@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>V12UltraController.SingleFilePipeProbe</AssemblyName>
+    <RootNamespace>V12UltraController.SingleFilePipeProbe</RootNamespace>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/V12UltraController.Service/V12UltraController.Service.csproj" />
+  </ItemGroup>
+</Project>

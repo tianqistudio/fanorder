@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="src/V12UltraController.Core/V12UltraController.Core.csproj" />
+  <Project Path="src/V12UltraController.Service/V12UltraController.Service.csproj" />
+  <Project Path="src/TianqiStudio.DesktopShortcuts/TianqiStudio.DesktopShortcuts.csproj" />
+  <Project Path="src/TianqiStudio.DesktopShortcuts.Wpf/TianqiStudio.DesktopShortcuts.Wpf.csproj" />
+  <Project Path="src/V12UltraController.Cli/V12UltraController.Cli.csproj" />
+  <Project Path="src/V12UltraController.Settings/V12UltraController.Settings.csproj" />
+  <Project Path="tests/V12UltraController.Tests/V12UltraController.Tests.csproj" />
+  <Project Path="tests/TianqiStudio.DesktopShortcuts.Tests/TianqiStudio.DesktopShortcuts.Tests.csproj" />
+  <Project Path="tests/V12UltraController.SingleFilePipeProbe/V12UltraController.SingleFilePipeProbe.csproj" />
+</Solution>

@@ -1,0 +1,69 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<WixLocalization Culture="zh-cn" Language="2052" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] 安装" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="正在检查更新" />
+  <String Id="UpdateButton" Value="更新到 [WixStdBAUpdateAvailable]" />
+  <String Id="InstallHeader" Value="欢迎" />
+  <String Id="InstallMessage" Value="将安装风序 · FanOrder。" />
+  <String Id="InstallMessageOptions" Value="将安装风序 · FanOrder，可在选项中选择快捷方式。" />
+  <String Id="InstallVersion" Value="版本 [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="确定取消安装？" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="旧版本" />
+  <String Id="HelpHeader" Value="安装帮助" />
+  <String Id="HelpText" Value="/install 安装；/repair 修复；/uninstall 卸载。默认安装。 /passive 简化界面；/quiet 静默。 /norestart 禁止自动重启。 /log 指定日志。 本机测试：CreateDesktopShortcut=0 CreateStartMenuShortcut=1。" />
+  <String Id="HelpCloseButton" Value="关闭" />
+  <String Id="InstallLicenseLinkText" Value="[WixBundleName] &lt;a href=&quot;#&quot;&gt;许可条款&lt;/a&gt;" />
+  <String Id="InstallAcceptCheckbox" Value="我同意许可条款" />
+  <String Id="InstallOptionsButton" Value="选项" />
+  <String Id="InstallInstallButton" Value="安装" />
+  <String Id="InstallCancelButton" Value="取消" />
+  <String Id="OptionsHeader" Value="快捷方式选项" />
+  <String Id="OptionsLocationLabel" Value="安装位置" />
+  <String Id="OptionsPerUserScopeText" Value="仅当前用户" />
+  <String Id="OptionsPerMachineScopeText" Value="所有用户" />
+  <String Id="OptionsBrowseButton" Value="浏览" />
+  <String Id="OptionsOkButton" Value="确定" />
+  <String Id="OptionsCancelButton" Value="取消" />
+  <String Id="ProgressHeader" Value="正在安装" />
+  <String Id="ProgressLabel" Value="正在处理" />
+  <String Id="OverallProgressPackageText" Value="正在初始化…" />
+  <String Id="ProgressCancelButton" Value="取消" />
+  <String Id="ModifyHeader" Value="维护风序 · FanOrder" />
+  <String Id="ModifyRepairButton" Value="修复" />
+  <String Id="ModifyUninstallButton" Value="卸载" />
+  <String Id="ModifyCancelButton" Value="取消" />
+  <String Id="SuccessHeader" Value="已完成" />
+  <String Id="SuccessCacheHeader" Value="缓存完成" />
+  <String Id="SuccessInstallHeader" Value="安装完成" />
+  <String Id="SuccessLayoutHeader" Value="离线包准备完成" />
+  <String Id="SuccessModifyHeader" Value="修改完成" />
+  <String Id="SuccessRepairHeader" Value="修复完成" />
+  <String Id="SuccessUninstallHeader" Value="卸载完成" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="卸载完成" />
+  <String Id="SuccessLaunchButton" Value="启动" />
+  <String Id="SuccessRestartText" Value="需要重启电脑才能完成操作。" />
+  <String Id="SuccessUninstallRestartText" Value="需要重启电脑才能完成卸载。" />
+  <String Id="SuccessRestartButton" Value="重启" />
+  <String Id="SuccessCloseButton" Value="关闭" />
+  <String Id="FailureHeader" Value="操作失败" />
+  <String Id="FailureCacheHeader" Value="缓存失败" />
+  <String Id="FailureInstallHeader" Value="安装失败" />
+  <String Id="FailureLayoutHeader" Value="离线包准备失败" />
+  <String Id="FailureModifyHeader" Value="修改失败" />
+  <String Id="FailureRepairHeader" Value="修复失败" />
+  <String Id="FailureUninstallHeader" Value="卸载失败" />
+  <String Id="FailureUnsafeUninstallHeader" Value="卸载失败" />
+  <String Id="FailureHyperlinkLogText" Value="请查看 &lt;a href=&quot;#&quot;&gt;安装日志&lt;/a&gt;，处理错误后重试。" />
+  <String Id="FailureRestartText" Value="需要重启电脑才能完成回滚。" />
+  <String Id="FailureRestartButton" Value="重启" />
+  <String Id="FailureCloseButton" Value="关闭" />
+  <String Id="FilesInUseTitle" Value="文件正在使用" />
+  <String Id="FilesInUseLabel" Value="以下程序正在使用需要更新的文件：" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="关闭程序" />
+  <String Id="FilesInUseCloseRadioButton" Value="关闭程序并尝试重新启动" />
+  <String Id="FilesInUseDontCloseRadioButton" Value="保留程序，稍后重启电脑" />
+  <String Id="FilesInUseRetryButton" Value="重试" />
+  <String Id="FilesInUseIgnoreButton" Value="忽略" />
+  <String Id="FilesInUseExitButton" Value="退出" />
+</WixLocalization>

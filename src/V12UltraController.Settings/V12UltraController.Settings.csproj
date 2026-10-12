@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>V12UltraController.Settings</AssemblyName>
+    <RootNamespace>V12UltraController.Settings</RootNamespace>
+    <ApplicationIcon>..\..\installer\assets\FanOrder.ico</ApplicationIcon>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="V12UltraController.SettingsPreview" />
+    <ProjectReference Include="../V12UltraController.Core/V12UltraController.Core.csproj" />
+    <ProjectReference Include="../TianqiStudio.DesktopShortcuts/TianqiStudio.DesktopShortcuts.csproj" />
+    <ProjectReference Include="../TianqiStudio.DesktopShortcuts.Wpf/TianqiStudio.DesktopShortcuts.Wpf.csproj" />
+  </ItemGroup>
+</Project>

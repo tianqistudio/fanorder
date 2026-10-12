@@ -1,0 +1,39 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="风序 · FanOrder"
+          Manufacturer="TianqiStudio"
+          Version="$(var.ProductVersion)"
+          UpgradeCode="DE983BC2-0B05-41AF-9084-B07134A536E4"
+          Compressed="yes"
+          bal:CommandLineVariables="caseInsensitive">
+    <Variable Name="CreateDesktopShortcut" Type="numeric" Value="1" Persisted="yes" bal:Overridable="yes" />
+    <Variable Name="CreateStartMenuShortcut" Type="numeric" Value="1" Persisted="yes" bal:Overridable="yes" />
+    <Variable Name="RemoveData"
+              Type="numeric"
+              Value="0"
+              bal:Overridable="yes" />
+    <Variable Name="ForceUninstall"
+              Type="numeric"
+              Value="0"
+              bal:Overridable="yes" />
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication Theme="hyperlinkLicense"
+                                              LicenseUrl=""
+                                              ThemeFile="..\assets\FanOrderTheme.xml"
+                                              LocalizationFile="..\assets\FanOrderTheme.zh-cn.wxl"
+                                              ShowVersion="yes" />
+    </BootstrapperApplication>
+    <Chain>
+      <MsiPackage Id="V12UltraControllerMsi"
+                  SourceFile="$(var.MsiSourcePath)"
+                  Compressed="yes"
+                  bal:DisplayInternalUICondition="0"
+                  Vital="yes">
+        <MsiProperty Name="REMOVE_DATA" Value="[RemoveData]" />
+        <MsiProperty Name="FORCE_UNINSTALL" Value="[ForceUninstall]" />
+        <MsiProperty Name="CREATE_DESKTOP_SHORTCUT" Value="[CreateDesktopShortcut]" />
+        <MsiProperty Name="CREATE_START_MENU_SHORTCUT" Value="[CreateStartMenuShortcut]" />
+      </MsiPackage>
+    </Chain>
+  </Bundle>
+</Wix>

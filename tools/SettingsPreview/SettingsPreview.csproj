@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>V12UltraController.SettingsPreview</AssemblyName>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/V12UltraController.Settings/V12UltraController.Settings.csproj" />
+    <ProjectReference Include="../../src/TianqiStudio.DesktopShortcuts/TianqiStudio.DesktopShortcuts.csproj" />
+  </ItemGroup>
+</Project>

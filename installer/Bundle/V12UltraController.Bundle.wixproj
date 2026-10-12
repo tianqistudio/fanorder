@@ -1,0 +1,16 @@
+<Project Sdk="WixToolset.Sdk/7.0.0">
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <Platform>x64</Platform>
+    <TargetName>V12UltraController.Setup</TargetName>
+    <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)\</OutputPath>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">0.1.0</ProductVersion>
+    <MsiSourcePath Condition="'$(MsiSourcePath)' == ''">$(MSBuildThisFileDirectory)..\Package\bin\$(Configuration)\V12UltraController.msi</MsiSourcePath>
+    <DefineConstants>$(DefineConstants);ProductVersion=$(ProductVersion);MsiSourcePath=$([System.IO.Path]::GetFullPath('$(MsiSourcePath)'))</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" Version="7.0.0" />
+    <ProjectReference Include="..\Package\V12UltraController.Package.wixproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+FanOrder 0.1.22 NSIS installer
+
+This EXE is built with unmodified NSIS 3.12 components, Modern UI 2 and the
+zlib compressor. NSIS copyright: 1999-2026 Contributors. The complete upstream
+COPYING file is installed as licenses/NSIS-3.12-COPYING.txt.
+Official source and distribution: https://nsis.sourceforge.io/Download
+
+No WiX compiler, MSI engine, Burn bootstrapper or WiX theme is embedded in this
+EXE. The accompanying THIRD-PARTY-NOTICES.md is the original application
+candidate's dependency inventory; its WiX/MSI sections describe the legacy
+installer source, not components in this NSIS package.
+
+PawnIO is not included. This installer checks the official 2.2.0.0 registration
+on fresh installation and never downloads or installs drivers.

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LibreHardwareMonitorLib" />
+    <!--
+      LibreHardwareMonitor uses Mono.Posix only behind its Unix-only runtime
+      branch and loads it through reflection. This product targets Windows x64
+      exclusively, so do not redistribute the unused managed/native runtime
+      assets. Keep compile assets available so restore can still validate the
+      upstream dependency contract.
+    -->
+    <PackageReference Include="Mono.Posix.NETStandard"
+                      ExcludeAssets="runtime;native"
+                      PrivateAssets="all" />
+  </ItemGroup>
+</Project>

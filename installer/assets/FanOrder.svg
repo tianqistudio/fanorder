@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="surface" x1="24" y1="20" x2="232" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#193A63"/>
+      <stop offset="1" stop-color="#0B172A"/>
+    </linearGradient>
+    <linearGradient id="blade" x1="86" y1="54" x2="182" y2="202" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8BE2FF"/>
+      <stop offset="1" stop-color="#2798E5"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="232" height="232" rx="52" fill="url(#surface)"/>
+  <circle cx="128" cy="128" r="88" fill="#081221" fill-opacity=".42" stroke="#4AA8FF" stroke-opacity=".45" stroke-width="4"/>
+  <g fill="url(#blade)">
+    <path d="M128 47c19 0 34 15 34 34 0 18-12 29-27 39-8 6-13 13-13 24 0-24-5-39-17-51-9-9-13-19-10-29 4-10 16-17 33-17Z"/>
+    <path d="M209 128c0 19-15 34-34 34-18 0-29-12-39-27-6-8-13-13-24-13 24 0 39-5 51-17 9-9 19-13 29-10 10 4 17 16 17 33Z"/>
+    <path d="M128 209c-19 0-34-15-34-34 0-18 12-29 27-39 8-6 13-13 13-24 0 24 5 39 17 51 9 9 13 19 10 29-4 10-16 17-33 17Z"/>
+    <path d="M47 128c0-19 15-34 34-34 18 0 29 12 39 27 6 8 13 13 24 13-24 0-39 5-51 17-9 9-19 13-29 10-10-4-17-16-17-33Z"/>
+  </g>
+  <circle cx="128" cy="128" r="24" fill="#F4F7FC"/>
+  <circle cx="128" cy="128" r="10" fill="#1675B9"/>
+</svg>

@@ -1,0 +1,450 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package Name="风序 · FanOrder"
+           Manufacturer="TianqiStudio"
+           Version="$(var.ProductVersion)"
+           Language="2052"
+           UpgradeCode="9747161B-8C8F-492E-8509-34071052A21D"
+           Scope="perMachine"
+           InstallerVersion="500"
+           Compressed="yes">
+
+    <SummaryInformation Description="V12 Ultra unattended local controller"
+                        Manufacturer="TianqiStudio" />
+    <!--
+      Install the new product before removing the old one so the stable HKLM
+      enrollment component remains referenced throughout a major upgrade. The
+      preflight actions below fail closed if that value is unexpectedly present
+      on a fresh install or missing during repair/upgrade.
+    -->
+    <MajorUpgrade DowngradeErrorMessage="已安装更新版本的 [ProductName]。"
+                  Schedule="afterInstallExecute" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Property Id="REMOVE_DATA" Value="0" Secure="yes" />
+    <Property Id="FORCE_UNINSTALL" Value="0" Secure="yes" />
+    <Property Id="CREATE_DESKTOP_SHORTCUT" Value="1" Secure="yes" />
+    <Property Id="CREATE_START_MENU_SHORTCUT" Value="1" Secure="yes" />
+    <Property Id="FanOrderSavedDesktop">
+      <RegistrySearch Id="ReadDesktopChoice" Root="HKLM" Key="Software\TianqiStudio\V12UltraController\Installer" Name="DesktopShortcut" Type="raw" Bitness="always64" />
+    </Property>
+    <Property Id="FanOrderSavedStartMenu">
+      <RegistrySearch Id="ReadStartMenuChoice" Root="HKLM" Key="Software\TianqiStudio\V12UltraController\Installer" Name="StartMenuShortcut" Type="raw" Bitness="always64" />
+    </Property>
+    <!-- Retain explicit choices on repair/upgrade instead of defaulting to yes. -->
+    <SetProperty Id="CREATE_DESKTOP_SHORTCUT" Action="RestoreDesktopOff" Value="0" Before="CostFinalize" Sequence="both" Condition="FanOrderSavedDesktop = &quot;#0&quot;" />
+    <SetProperty Id="CREATE_DESKTOP_SHORTCUT" Action="RestoreDesktopOn" Value="1" Before="CostFinalize" Sequence="both" Condition="FanOrderSavedDesktop = &quot;#1&quot;" />
+    <SetProperty Id="CREATE_START_MENU_SHORTCUT" Action="RestoreStartMenuOff" Value="0" Before="CostFinalize" Sequence="both" Condition="FanOrderSavedStartMenu = &quot;#0&quot;" />
+    <SetProperty Id="CREATE_START_MENU_SHORTCUT" Action="RestoreStartMenuOn" Value="1" Before="CostFinalize" Sequence="both" Condition="FanOrderSavedStartMenu = &quot;#1&quot;" />
+    <Launch Condition="CREATE_DESKTOP_SHORTCUT = 0 OR CREATE_DESKTOP_SHORTCUT = 1" Message="桌面快捷方式选项必须为0或1。" />
+    <Launch Condition="CREATE_START_MENU_SHORTCUT = 0 OR CREATE_START_MENU_SHORTCUT = 1" Message="开始菜单快捷方式选项必须为0或1。" />
+    <!-- Private, searched in each MSI sequence; never accept a command-line
+         replacement for the existing machine preference. DWORD raw values use #. -->
+    <Property Id="V12ExistingServiceStart">
+      <RegistrySearch Id="ReadExistingServiceStart"
+                      Root="HKLM"
+                      Key="SYSTEM\CurrentControlSet\Services\TianqiStudio.V12UltraController"
+                      Name="Start"
+                      Type="raw"
+                      Bitness="always64" />
+    </Property>
+    <Launch Condition="REMOVE~=&quot;ALL&quot; OR NOT V12ExistingServiceStart OR V12ExistingServiceStart = &quot;#2&quot; OR V12ExistingServiceStart = &quot;#3&quot;"
+            Message="现有后台服务不是自动或手动启动状态。为保留管理员设置，已停止安装；卸载不受此限制。" />
+    <!--
+      Mixed-case makes this a private MSI property: unlike REMOVE_DATA it
+      cannot be supplied on the command line. RemoveFolderEx therefore always
+      receives this compile-time fixed path.
+    -->
+    <Property Id="V12DataPath"
+              Value="%ProgramData%\TianqiStudio\V12UltraController"
+              Hidden="yes"
+              Secure="no" />
+
+    <!-- MSI VersionNT stays at 603 on Windows 10. Read the real build from
+         the 64-bit OS registry instead; PawnIO 2.2.0 requires build 17763 or later.
+         A private property prevents a command-line value replacing this search. -->
+    <Property Id="V12WindowsBuildNumber">
+      <RegistrySearch Id="ReadWindowsBuildNumber"
+                      Root="HKLM"
+                      Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+                      Name="CurrentBuildNumber"
+                      Type="raw"
+                      Bitness="always64" />
+    </Property>
+
+    <!-- Registration is an installation prerequisite hint, not proof of a loaded,
+         signed driver or usable CPU telemetry. Keep maintenance possible if the
+         separately managed driver has been removed. Never install/downgrade it here. -->
+    <Property Id="V12PawnIoRegisteredVersion">
+      <RegistrySearch Id="ReadPawnIoRegisteredVersion"
+                      Root="HKLM"
+                      Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PawnIO"
+                      Name="DisplayVersion"
+                      Type="raw"
+                      Bitness="always64" />
+    </Property>
+    <Launch Condition="Installed OR V12PawnIoRegisteredVersion = &quot;2.2.0.0&quot;"
+            Message="未检测到本项目已核验的 PawnIO 2.2.0 安装登记。首次安装/主要升级前，请先通过 pawnio.eu 安装官方数字签名版（不要选择 Unrestricted）。若已装其他版本，请先核验兼容性，不要自动降级。安装登记不代表驱动或 CPU 温度已通过验收。" />
+
+    <Launch Condition="VersionNT64 AND V12WindowsBuildNumber &gt;= 17763 AND MsiNTProductType = 1"
+            Message="V12 Ultra Controller 仅支持 Windows 10/11 64 位工作站版本，系统 build 必须至少为 17763，以满足 PawnIO 温度驱动要求。" />
+    <Launch Condition="UserSID" Message="Windows Installer 未能确定安装发起用户的 SID，已为防止设置程序被锁死而终止安装。" />
+    <Launch Condition="REMOVE_DATA = 0 OR REMOVE_DATA = 1" Message="REMOVE_DATA 只能显式设置为 0 或 1。" />
+    <Launch Condition="FORCE_UNINSTALL = 0 OR FORCE_UNINSTALL = 1" Message="FORCE_UNINSTALL 只能显式设置为 0 或 1。" />
+    <Launch Condition="FORCE_UNINSTALL = 0 OR REMOVE_DATA = 0"
+            Message="强制卸载必须保留恢复标记、任务备份和审计日志；不能同时请求删除 ProgramData。" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="CompanyFolder" Name="TianqiStudio">
+        <Directory Id="INSTALLFOLDER" Name="V12UltraController">
+          <Directory Id="ServiceFolder" Name="Service" />
+          <Directory Id="SettingsFolder" Name="Settings" />
+          <Directory Id="CliFolder" Name="Cli" />
+          <Directory Id="LicensesFolder" Name="Licenses" />
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="ProgramDataCompanyFolder" Name="TianqiStudio">
+        <Directory Id="DataFolder" Name="V12UltraController">
+          <Directory Id="LogsFolder" Name="logs" />
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramsFolder" Name="tianqistudio" />
+    </StandardDirectory>
+    <StandardDirectory Id="DesktopFolder" />
+
+    <Component Id="ServiceExecutableComponent"
+               Guid="D39F183E-E60B-4196-B78E-C28ADE4C9B8C"
+               Directory="ServiceFolder">
+      <File Id="ServiceExe"
+            Source="$(var.PublishRoot)\service\V12UltraController.Service.exe"
+            KeyPath="yes" />
+      <ServiceInstall Id="ControllerServiceInstall"
+                      Name="TianqiStudio.V12UltraController"
+                      DisplayName="TianqiStudio V12 Ultra Controller"
+                      Description="V12 Ultra 本地无人值守散热控制服务"
+                      Type="ownProcess"
+                      Start="auto"
+                      ErrorControl="normal"
+                      Account="LocalSystem"
+                      Vital="yes">
+        <ServiceConfigFailureActions OnInstall="yes"
+                                     OnReinstall="yes"
+                                     ResetPeriod="86400">
+          <Failure Action="restartService" Delay="5000" />
+          <Failure Action="restartService" Delay="15000" />
+          <Failure Action="restartService" Delay="60000" />
+        </ServiceConfigFailureActions>
+      </ServiceInstall>
+      <ServiceControl Id="ControllerServiceControl"
+                      Name="TianqiStudio.V12UltraController"
+                      Start="install"
+                      Stop="both"
+                      Remove="uninstall"
+                      Wait="yes" />
+    </Component>
+
+    <Component Id="SettingsExecutableComponent"
+               Guid="049BC8A5-4F63-403A-8596-5111085DCE36"
+               Directory="SettingsFolder">
+      <File Id="SettingsExe"
+            Source="$(var.PublishRoot)\settings\V12UltraController.Settings.exe"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="CliExecutableComponent"
+               Guid="3089F6A2-2274-4F78-8F04-9A23D3B819DE"
+               Directory="CliFolder">
+      <File Id="CliExe"
+            Source="$(var.PublishRoot)\cli\v12ctl.exe"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="ThirdPartyNoticesComponent"
+               Guid="9E5B0D36-6A16-44E5-9BA0-2B1B84CF65FC"
+               Directory="INSTALLFOLDER">
+      <File Id="ThirdPartyNoticesFile"
+            Name="THIRD-PARTY-NOTICES.md"
+            Source="..\..\THIRD-PARTY-NOTICES.md"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="MplLicenseComponent"
+               Guid="CFBC8B85-71AE-4EB3-BA04-04BAF1D64F08"
+               Directory="LicensesFolder">
+      <File Id="MplLicenseFile"
+            Name="MPL-2.0.txt"
+            Source="..\..\docs\licenses\MPL-2.0.txt"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="ApacheLicenseComponent"
+               Guid="04BB2767-D3E2-4288-B68F-B937D07D0E43"
+               Directory="LicensesFolder">
+      <File Id="ApacheLicenseFile"
+            Name="Apache-2.0.txt"
+            Source="..\..\docs\licenses\Apache-2.0.txt"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="DotNetMitLicenseComponent"
+               Guid="70E2F399-363A-448D-8A6A-FB3FF60CCF88"
+               Directory="LicensesFolder">
+      <File Id="DotNetMitLicenseFile"
+            Name="MIT-DotNet.txt"
+            Source="..\..\docs\licenses\MIT-DotNet.txt"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="DotNetThirdPartyNoticesComponent"
+               Guid="BE0A25F7-991A-4741-8E17-515E0C9651F3"
+               Directory="LicensesFolder">
+      <File Id="DotNetThirdPartyNoticesFile"
+            Name="DotNet-10.0.11-ThirdPartyNotices.txt"
+            Source="..\..\docs\licenses\DotNet-10.0.11-ThirdPartyNotices.txt"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="MsrlLicenseComponent"
+               Guid="01E1B254-F5D0-48F9-9866-D28A3D983B24"
+               Directory="LicensesFolder">
+      <File Id="MsrlLicenseFile"
+            Name="MS-RL.txt"
+            Source="..\..\docs\licenses\MS-RL.txt"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="WixOsmfEulaComponent"
+               Guid="F21D549E-5DC5-4AF1-996F-DBC728398DF8"
+               Directory="LicensesFolder">
+      <File Id="WixOsmfEulaFile"
+            Name="WiX-7.0.0-OSMF-EULA.txt"
+            Source="..\..\docs\licenses\WiX-7.0.0-OSMF-EULA.txt"
+            KeyPath="yes" />
+    </Component>
+
+    <Component Id="ProgramDataIdentityComponent"
+               Guid="3FF9ADF9-40C8-4270-87E4-01381EBAF31B"
+               NeverOverwrite="yes"
+               Bitness="always64"
+               Directory="DataFolder">
+      <CreateFolder>
+        <PermissionEx Id="ProgramDataDirectoryAcl"
+                      Sddl="D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)" />
+      </CreateFolder>
+      <RegistryValue Id="AuthorizedUserSidRegistryValue"
+                     Root="HKLM"
+                     Key="Software\TianqiStudio\V12UltraController\Enrollment"
+                     Name="AuthorizedUserSid"
+                     Type="string"
+                     Value="[UserSID]"
+                     KeyPath="yes">
+        <PermissionEx Id="AuthorizedUserSidRegistryAcl"
+                      Sddl="D:P(A;;KA;;;SY)(A;;KA;;;BA)" />
+      </RegistryValue>
+    </Component>
+
+    <Component Id="LogDirectoryComponent"
+               Guid="4EB93FFA-AB7E-4734-9AFB-F07C9438CF5F"
+               Directory="LogsFolder">
+      <CreateFolder>
+        <PermissionEx Id="LogsDirectoryAcl"
+                      Sddl="D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)" />
+      </CreateFolder>
+      <RegistryValue Root="HKLM"
+                     Key="Software\TianqiStudio\V12UltraController"
+                     Name="DataDirectoriesCreated"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes" />
+    </Component>
+
+    <!--
+      ProgramData is retained by default. REMOVE_DATA=1 is the only deletion
+      gate, and V12DataPath is a private compile-time constant rather than caller
+      input, preventing this recursive removal from escaping the product data
+      directory. FORCE_UNINSTALL must retain its recovery marker and evidence;
+      both the launch condition and this component condition prohibit combining
+      the escape hatch with recursive data removal.
+    -->
+    <Component Id="OptionalProgramDataCleanupComponent"
+               Guid="E0C6979B-61DD-46D0-9171-9D426159723E"
+               Directory="DataFolder">
+      <RegistryValue Root="HKLM"
+                     Key="Software\TianqiStudio\V12UltraController"
+                     Name="OptionalDataCleanupRegistered"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes" />
+      <util:RemoveFolderEx Id="RemoveProgramDataOnExplicitUninstall"
+                           On="uninstall"
+                            Property="V12DataPath"
+                           Condition="REMOVE_DATA = 1 AND FORCE_UNINSTALL &lt;&gt; 1 AND REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+    </Component>
+
+    <Component Id="StartMenuCleanupComponent"
+               Guid="4BC2F98E-0E5B-4B5C-B967-B8B70776DC32"
+               Directory="ProgramsFolder" Condition="CREATE_START_MENU_SHORTCUT = 1" Transitive="yes">
+      <Shortcut Id="SettingsStartMenuShortcut" Name="风序 · FanOrder" Target="[#SettingsExe]" WorkingDirectory="SettingsFolder" Advertise="no" />
+      <Shortcut Id="CliStartMenuShortcut" Name="风序 · FanOrder CLI" Target="[System64Folder]cmd.exe" Arguments="/D /K &quot;&quot;[CliFolder]v12ctl.exe&quot; --help&quot;" WorkingDirectory="CliFolder" Advertise="no" />
+      <RemoveFolder Id="RemoveProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\TianqiStudio\V12UltraController"
+                     Name="StartMenuInstalled"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes" />
+    </Component>
+
+    <Component Id="DesktopShortcutComponent" Guid="542D70B9-4B09-4493-BAC2-5A257242F70D" Directory="DesktopFolder" Condition="CREATE_DESKTOP_SHORTCUT = 1" Transitive="yes">
+      <Shortcut Id="SettingsDesktopShortcut" Name="风序 · FanOrder" Target="[#SettingsExe]" WorkingDirectory="SettingsFolder" Advertise="no" />
+      <RegistryValue Root="HKCU" Key="Software\TianqiStudio\V12UltraController" Name="DesktopInstalled" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+    <Component Id="ShortcutPreferencesComponent" Guid="0D4CCB6D-6F3D-4FCF-B46E-7C4E6D83FEF1" Directory="INSTALLFOLDER">
+      <RegistryValue Root="HKLM" Key="Software\TianqiStudio\V12UltraController\Installer" Name="DesktopShortcut" Type="integer" Value="[CREATE_DESKTOP_SHORTCUT]" KeyPath="yes" />
+      <RegistryValue Root="HKLM" Key="Software\TianqiStudio\V12UltraController\Installer" Name="StartMenuShortcut" Type="integer" Value="[CREATE_START_MENU_SHORTCUT]" />
+    </Component>
+
+    <!--
+      Both enrollment checks use only the installed CLI's fixed-purpose,
+      read-only HKLM command. They run after the CLI is installed but before MSI
+      can create or replace the enrollment value. Full uninstall never runs them.
+    -->
+    <CustomAction Id="PreflightFreshInstallerEnrollment"
+                  FileRef="CliExe"
+                  ExeCommand="installer-preflight fresh"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+    <CustomAction Id="PreflightExistingInstallerEnrollment"
+                  FileRef="CliExe"
+                  ExeCommand="installer-preflight existing"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+    <!--
+      UserSID can legitimately resolve to LocalSystem when deployment itself is
+      launched by a machine agent. A successful installation must always enroll
+      one specific interactive user, so read back and validate the value after
+      MSI writes it but before the service can start. Failure rolls the fresh
+      install back instead of leaving an administrator-only partial product.
+    -->
+    <CustomAction Id="ValidateFreshInstallerEnrollment"
+                  FileRef="CliExe"
+                  ExeCommand="installer-preflight existing"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+
+    <!--
+      FORCE_UNINSTALL deliberately skips verified Myth.Cool rollback. Before
+      that escape path may stop/remove the service, LocalSystem must durably
+      create the fixed ProgramData recovery barrier. A failure is fatal; no
+      path or marker contents are supplied by MSI.
+    -->
+    <CustomAction Id="MarkForcedUninstallRecovery"
+                  FileRef="CliExe"
+                  ExeCommand="installer mark-forced-uninstall"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+
+    <!--
+      Normal uninstall starts a stopped controller before asking it to restore
+      the pre-commissioning Myth.Cool task state. The start result is ignored
+      because an already-running service makes sc.exe return non-zero; the
+      checked rollback command remains the authoritative fail-closed gate.
+      FORCE_UNINSTALL=1 is the explicit recovery escape hatch and skips both.
+    -->
+    <CustomAction Id="StartControllerForUninstallRollback"
+                  Directory="System64Folder"
+                  ExeCommand="&quot;[System64Folder]sc.exe&quot; start TianqiStudio.V12UltraController"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+    <CustomAction Id="RollbackCommissioningOnUninstall"
+                  FileRef="CliExe"
+                   ExeCommand="commission rollback --installer --start-mythcool false"
+                   Execute="deferred"
+                   Impersonate="no"
+                   Return="check" />
+    <!-- InstallServices uses an authored automatic default. Preserve the prior
+         Manual preference on both successful maintenance and transaction undo.
+         Commands have a fixed service name and no caller-controlled arguments.
+         This does not suppress starting the service for the current install. -->
+    <CustomAction Id="RestoreManualStartup"
+                  Directory="System64Folder"
+                  ExeCommand="&quot;[System64Folder]sc.exe&quot; config TianqiStudio.V12UltraController start= demand"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+    <CustomAction Id="RollbackManualStartup"
+                  Directory="System64Folder"
+                  ExeCommand="&quot;[System64Folder]sc.exe&quot; config TianqiStudio.V12UltraController start= demand"
+                  Execute="rollback"
+                  Impersonate="no"
+                  Return="check" />
+    <InstallExecuteSequence>
+      <Custom Action="RollbackManualStartup"
+              Before="InstallServices"
+              Condition="NOT REMOVE~=&quot;ALL&quot; AND V12ExistingServiceStart = &quot;#3&quot;" />
+      <Custom Action="RestoreManualStartup"
+              After="InstallServices"
+              Condition="NOT REMOVE~=&quot;ALL&quot; AND V12ExistingServiceStart = &quot;#3&quot;" />
+      <Custom Action="PreflightFreshInstallerEnrollment"
+              After="InstallFiles"
+              Condition="NOT Installed AND NOT WIX_UPGRADE_DETECTED AND NOT REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="PreflightExistingInstallerEnrollment"
+              Before="WriteRegistryValues"
+              Condition="(Installed OR WIX_UPGRADE_DETECTED) AND NOT REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="ValidateFreshInstallerEnrollment"
+              After="WriteRegistryValues"
+              Condition="NOT Installed AND NOT WIX_UPGRADE_DETECTED AND NOT REMOVE~=&quot;ALL&quot;" />
+      <Custom Action="MarkForcedUninstallRecovery"
+              Before="StopServices"
+              Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE AND FORCE_UNINSTALL = 1" />
+      <Custom Action="StartControllerForUninstallRollback"
+              Before="RollbackCommissioningOnUninstall"
+              Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE AND FORCE_UNINSTALL &lt;&gt; 1" />
+      <Custom Action="RollbackCommissioningOnUninstall"
+              Before="StopServices"
+               Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE AND FORCE_UNINSTALL &lt;&gt; 1" />
+    </InstallExecuteSequence>
+
+    <Feature Id="Complete" Title="V12 Ultra Controller" Level="1">
+      <Files Include="$(var.PublishRoot)\service\**" Directory="ServiceFolder">
+        <Exclude Files="$(var.PublishRoot)\service\V12UltraController.Service.exe" />
+        <Exclude Files="$(var.PublishRoot)\service\*.pdb" />
+      </Files>
+      <Files Include="$(var.PublishRoot)\settings\**" Directory="SettingsFolder">
+        <Exclude Files="$(var.PublishRoot)\settings\V12UltraController.Settings.exe" />
+        <Exclude Files="$(var.PublishRoot)\settings\*.pdb" />
+      </Files>
+      <Files Include="$(var.PublishRoot)\cli\**" Directory="CliFolder">
+        <Exclude Files="$(var.PublishRoot)\cli\v12ctl.exe" />
+        <Exclude Files="$(var.PublishRoot)\cli\*.pdb" />
+      </Files>
+      <ComponentRef Id="ServiceExecutableComponent" />
+      <ComponentRef Id="SettingsExecutableComponent" />
+      <ComponentRef Id="CliExecutableComponent" />
+      <ComponentRef Id="ThirdPartyNoticesComponent" />
+      <ComponentRef Id="MplLicenseComponent" />
+      <ComponentRef Id="ApacheLicenseComponent" />
+      <ComponentRef Id="DotNetMitLicenseComponent" />
+      <ComponentRef Id="DotNetThirdPartyNoticesComponent" />
+      <ComponentRef Id="MsrlLicenseComponent" />
+      <ComponentRef Id="WixOsmfEulaComponent" />
+      <ComponentRef Id="ProgramDataIdentityComponent" />
+      <ComponentRef Id="LogDirectoryComponent" />
+      <ComponentRef Id="OptionalProgramDataCleanupComponent" />
+      <ComponentRef Id="StartMenuCleanupComponent" />
+      <ComponentRef Id="DesktopShortcutComponent" />
+      <ComponentRef Id="ShortcutPreferencesComponent" />
+    </Feature>
+  </Package>
+</Wix>
