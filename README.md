@@ -21,7 +21,7 @@
 
 ## 下载与安装
 
-Windows x64 安装程序见 [0.1.25 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.25-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。安装包未签名，尚未完成完整安装、升级及卸载验收。
+Windows x64 安装程序见 [0.1.25 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.25-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
 
 此安装包基于 0.1.25，不包含后续 0.1.26 界面补丁及当前源码的可靠性改进；下列构建命令针对当前源码。
 
