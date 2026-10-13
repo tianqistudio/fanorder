@@ -1,6 +1,7 @@
 # Public source allowlist
 /*
 !/.gitignore
+!/.editorconfig
 !/README.md
 !/THIRD-PARTY-NOTICES.md
 !/Directory.Build.props
