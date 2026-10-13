@@ -4,7 +4,9 @@
 
 适用于 Windows 的 V12 Ultra 风扇控制工具，提供温控曲线、手动调速、灯光预设与托盘快捷操作。
 
-## 功能
+<a id="功能"></a>
+
+## 主要功能
 
 - 自动温控、手动与纯手动模式，支持曲线和方案管理。
 - 风扇开关、转速调整、灯光预设及状态回读。
@@ -19,15 +21,19 @@
 
 硬件接管需要显式配对和验证。温度监控依赖 LibreHardwareMonitor；目标机器可能需要单独安装 PawnIO。仓库不附带厂商软件、固件或驱动安装包。
 
-## 下载与安装
+<a id="下载与安装"></a>
+
+## 安装与使用
 
 Windows x64 安装程序见 [0.1.25 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.25-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
 
 此安装包基于 0.1.25，不包含后续 0.1.26 界面补丁及当前源码的可靠性改进；下列构建命令针对当前源码。
 
-## 从源码构建
+<a id="从源码构建"></a>
 
-安装与 `global.json` 匹配的 .NET 10 SDK，在 Windows x64 上运行：
+## 开发与测试
+
+安装与 `global.json` 匹配的 .NET 10 SDK，在 Windows x64 的项目根目录运行：
 
 ```powershell
 dotnet restore V12UltraController.slnx --locked-mode
@@ -37,8 +43,12 @@ dotnet build V12UltraController.slnx -c Release --no-restore
 离线回归测试：
 
 ```powershell
-dotnet test tests/V12UltraController.Tests/V12UltraController.Tests.csproj -c Release --no-build
-dotnet test tests/TianqiStudio.DesktopShortcuts.Tests/TianqiStudio.DesktopShortcuts.Tests.csproj -c Release --no-build
+dotnet test `
+  tests/V12UltraController.Tests/V12UltraController.Tests.csproj `
+  -c Release --no-build
+dotnet test `
+  tests/TianqiStudio.DesktopShortcuts.Tests/TianqiStudio.DesktopShortcuts.Tests.csproj `
+  -c Release --no-build
 ```
 
 测试采用模拟设备，不向真实设备发送 HID 写入。构建与测试不会安装服务或接管风扇。
