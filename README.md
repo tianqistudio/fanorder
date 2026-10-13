@@ -63,4 +63,4 @@ dotnet test tests/TianqiStudio.DesktopShortcuts.Tests/TianqiStudio.DesktopShortc
 
 第三方依赖和许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
-由 [tianqistudio](https://tianqistudio.com) 制作。
+由 [tianqistudio](https://tianqistudio.com/home) 制作。
