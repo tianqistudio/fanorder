@@ -2,7 +2,7 @@
 
 <img src="installer/assets/FanOrder.svg" width="88" alt="FanOrder 图标">
 
-适用于 Windows 的 V12 Ultra 风扇控制工具，提供温控曲线、手动调速、灯光预设与托盘快捷操作。
+专为绿巨能（llano）V12Ultra（原 V16）AI 智能控温笔记本压风式散热器开发的 Windows 控制工具，提供温控曲线、手动调速、灯光预设与托盘快捷操作。
 
 <a id="功能"></a>
 
@@ -17,7 +17,19 @@
 
 ## 平台与设备
 
-当前目标为 Windows x64、.NET 10，仅适配 V12 Ultra。内部程序、服务与命名管道继续使用 `V12UltraController` 标识，以保持安装兼容性。
+**仅适配下列具体产品，不适用于所有绿巨能散热器或其他型号的风扇。**
+
+| 识别项 | 对应产品 |
+| --- | --- |
+| 品牌 | 绿巨能（llano） |
+| 产品 | V12Ultra（原 V16）AI 智能控温笔记本压风式散热器 |
+| 商品选项 | V12Ultra（原 V16）-AI 智控款 |
+| 京东商品编号 | [100211395916](https://item.jd.com/100211395916.html) |
+| 国补备案型号 | SV107（商品页标注） |
+
+V11、V11 Pro、普通 V12 及其他型号不在当前适配范围内。「原 V16」沿用上述商品页的命名，不代表所有以 V16 命名的产品都兼容。商品名称和备案型号用于辨认产品，实际接管仍需通过设备身份检查与配对验证。
+
+当前目标为 Windows x64、.NET 10。内部程序、服务与命名管道继续使用 `V12UltraController` 标识，以保持安装兼容性。
 
 硬件接管需要显式配对和验证。温度监控依赖 LibreHardwareMonitor；目标机器可能需要单独安装 PawnIO。仓库不附带厂商软件、固件或驱动安装包。
 
@@ -25,9 +37,9 @@
 
 ## 安装与使用
 
-Windows x64 安装程序见 [0.1.25 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.25-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
+Windows x64 安装程序见 [0.1.27 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.27-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
 
-此安装包基于 0.1.25，不包含后续 0.1.26 界面补丁及当前源码的可靠性改进；下列构建命令针对当前源码。
+本版从当前源码构建，更新内容与验证范围见 [0.1.27 发布说明](docs/release-0.1.27.md)。
 
 <a id="从源码构建"></a>
 

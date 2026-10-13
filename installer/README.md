@@ -2,7 +2,7 @@
 
 `nsis/` 是 Windows x64 NSIS 安装器实现；`Package/` 与 `Bundle/` 保留 WiX 安装器实现和契约测试所需源码。`assets/` 提供产品图标。
 
-本次源码发布不附带安装包、NSIS 编译器、厂商软件或驱动。构建解决方案不会运行安装器。
+Windows x64 安装包见 [GitHub Releases](https://github.com/tianqistudio/fanorder/releases)。源码仓库不附带 NSIS 编译器、厂商软件或驱动。构建解决方案不会运行安装器。
 
 NSIS 打包需要独立准备 NSIS 3.12 工具链，并生成与当前源码匹配的应用候选及校验清单。`build-nsis.ps1` 和 `build-setup.ps1` 会验证候选输入；旧候选不能替代当前源码。WiX 路径另受其许可条件和显式参数约束。
 

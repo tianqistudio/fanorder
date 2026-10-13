@@ -21,7 +21,7 @@ public partial class MainWindow
             item.Click += (_, _) =>
             {
                 item.IsChecked = true;
-                ActivityText.Text = "已选 V12 Ultra；切换不会调速或接管。";
+                ActivityText.Text = "已选绿巨能 V12Ultra（原 V16）AI 智控款；切换不会调速或接管。";
             };
             menu.Items.Add(item);
         }

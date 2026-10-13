@@ -1,4 +1,4 @@
-FanOrder 0.1.22 NSIS installer
+FanOrder NSIS installer
 
 This EXE is built with unmodified NSIS 3.12 components, Modern UI 2 and the
 zlib compressor. NSIS copyright: 1999-2026 Contributors. The complete upstream

@@ -17,7 +17,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Tag="device">
                     <TextBlock Text="风序 · FanOrder" FontSize="21" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <Button x:Name="DeviceSwitchButton" Content="V12 Ultra  ▾" HorizontalAlignment="Left" Margin="20,0,0,0" Style="{StaticResource SecondaryButtonStyle}" AutomationProperties.Name="切换设备型号" Click="DeviceSwitchButton_Click" ToolTip="仅支持 V12 Ultra；选择不等于已连接。" VerticalAlignment="Center" />
+                    <Button x:Name="DeviceSwitchButton" Content="llano V12Ultra  ▾" HorizontalAlignment="Left" Margin="20,0,0,0" Style="{StaticResource SecondaryButtonStyle}" AutomationProperties.Name="切换设备型号" Click="DeviceSwitchButton_Click" ToolTip="仅适配绿巨能 V12Ultra（原 V16）AI 智控款；选择不等于已连接。" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Tag="connection">
                     <Button x:Name="StartBackendButton" Content="启动后台" Margin="0,0,12,0" Style="{StaticResource SecondaryButtonStyle}" ToolTip="只启动后台，不改自启；已接管时恢复保存策略。" Click="StartBackendButton_Click" />
@@ -843,6 +843,8 @@
                                 <StackPanel>
                                     <TextBlock x:Name="VersionStatusText" Text="后台尚未连接" TextWrapping="Wrap" />
                                     <TextBlock x:Name="CompatibilityText" Margin="0,12,0,0" TextWrapping="Wrap" />
+                                    <TextBlock Margin="0,12,0,0" TextWrapping="Wrap" Text="仅适配绿巨能（llano）V12Ultra（原 V16）AI 智控款笔记本压风式散热器。" />
+                                    <TextBlock Margin="0,6,0,0" TextWrapping="Wrap" Text="京东商品编号：100211395916 · 国补备案型号：SV107。V11、V11 Pro、普通 V12 及其他型号不在适配范围内。" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource CardStyle}" Margin="0,12,0,0">

@@ -5,7 +5,7 @@ public sealed record DeviceProfile(string Id, string DisplayName, DeviceIdentity
 
 public static class DeviceProfileCatalog
 {
-    public static DeviceProfile V12Ultra { get; } = new("llano-v12-ultra", "V12 Ultra",
+    public static DeviceProfile V12Ultra { get; } = new("llano-v12-ultra", "llano V12Ultra",
         new(DeviceAllowList.V12UltraVendorId, DeviceAllowList.V12UltraProductId,
             DeviceAllowList.V12UltraFirmwareVersion, DeviceAllowList.V12UltraUsagePage,
             DeviceAllowList.V12UltraUsage));

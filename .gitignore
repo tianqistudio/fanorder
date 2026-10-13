@@ -17,6 +17,7 @@
 !/docs/licenses/
 !/docs/source-release.md
 !/docs/release-0.1.25.md
+!/docs/release-0.1.27.md
 /installer/*
 !/installer/assets/
 !/installer/Package/
