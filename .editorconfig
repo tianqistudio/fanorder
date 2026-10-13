@@ -1,0 +1,28 @@
+# Active source formatting; existing nested configurations take precedence.
+root = true
+
+[/{src/**.cs,tests/**.cs,tools/**.cs,src/**.py,tests/**.py,tools/**.py}]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[/{src/**.js,tests/**.js,tools/**.js,src/**.mjs,tests/**.mjs,tools/**.mjs,src/**.cjs,tests/**.cjs,tools/**.cjs,src/**.ts,tests/**.ts,tools/**.ts,src/**.tsx,tests/**.tsx,tools/**.tsx}]
+charset = utf-8
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[/{README.md,README.en.md}]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = false
+
+[**/{bin,obj,dist,build,node_modules,vendor,__pycache__,.venv,.venv-worker,archive,Archived,archives,artifacts,releases,qa,generated}/**]
+charset = unset
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
