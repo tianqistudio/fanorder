@@ -167,7 +167,7 @@ public partial class MainWindow : Window
 
     private async void FanOffButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!(ConfirmFanOff?.Invoke(FanOffConfirmationText) ?? MessageBox.Show(this,
+        if (!(ConfirmFanOff?.Invoke(FanOffConfirmationText) ?? LocalizedMessageBox.Show(this,
                 FanOffConfirmationText, "关闭风扇", MessageBoxButton.YesNo, MessageBoxImage.Warning,
                 MessageBoxResult.No) == MessageBoxResult.Yes))
         {
@@ -488,7 +488,7 @@ public partial class MainWindow : Window
         await RunCommandAsync(async () =>
         {
             var sessionId = RequireCommissionSession();
-            var confirmation = MessageBox.Show(
+            var confirmation = LocalizedMessageBox.Show(
                 "服务将备份并禁用 \\Myth.Cool 计划任务，然后成为散热器的唯一写入者。\n\n确定正式接管吗？",
                 "确认接管",
                 MessageBoxButton.YesNo,
@@ -536,7 +536,7 @@ public partial class MainWindow : Window
             const string recoveryWarning =
                 "\n\n若计划任务变更超时或结果无法确认，服务会保留恢复 journal 并阻止继续控制；" +
                 "单纯重启不会清除该状态，必须有人看护地核对并恢复计划任务。";
-            var confirmation = MessageBox.Show(
+            var confirmation = LocalizedMessageBox.Show(
                 startMythCool
                     ? "将尽力写入 100%，释放设备并恢复原计划任务状态；仅当服务确认存在可恢复且原先启用的任务时，才会立即启动 Myth.Cool。" +
                       recoveryWarning
@@ -576,7 +576,7 @@ public partial class MainWindow : Window
         await RunCommandAsync(async () =>
         {
             RequireAttended();
-            var confirmation = MessageBox.Show(
+            var confirmation = LocalizedMessageBox.Show(
                 "此操作只适用于服务已经保留的 TaskDisableInProgress 或 TaskRestoreInProgress journal。\n\n" +
                 "服务不会执行、启用、禁用或启动任何计划任务；它只读核验当前任务的精确 XML、启用状态和本地接管状态。" +
                 "若证据只能证明恢复命令未生效，服务可能把本地状态补偿回自研控制器所有权。\n\n继续吗？",
@@ -617,7 +617,7 @@ public partial class MainWindow : Window
                     "必须确认正在电脑旁看护、低负载、低于 60°C 且 Myth.Cool 已退出。");
             }
 
-            var confirmation = MessageBox.Show(
+            var confirmation = LocalizedMessageBox.Show(
                 "服务将执行 GET → ON 100% → GET → OFF → GET → ON 100% → GET。\n\n" +
                 "风扇会短暂停止；进入 OFF 后，即使关闭窗口或取消请求，服务也会继续到最终 ON 100% 精确回读。" +
                 "成功后只生成 2 分钟的内存资格，不会启用关机关闭；必须再进行一次明确确认。\n\n" +
@@ -665,7 +665,7 @@ public partial class MainWindow : Window
                 throw new InvalidOperationException("没有可确认的短时资格；请重新运行资格测试。");
             }
 
-            var confirmation = MessageBox.Show(
+            var confirmation = LocalizedMessageBox.Show(
                 "你必须已经亲眼观察到风扇在资格测试后恢复运行。\n\n" +
                 "确认后服务仍会重新检查身份、所有权、冲突、策略与低于 60°C 的新鲜温度，" +
                 "然后才保存关机关闭。Windows Restart 也可能短暂 OFF；Fast Startup、睡眠和休眠不保证。\n\n" +
@@ -699,7 +699,7 @@ public partial class MainWindow : Window
     private async void DisableShutdownButton_Click(object sender, RoutedEventArgs e) =>
         await RunCommandAsync(async () =>
         {
-            var confirmation = MessageBox.Show(
+            var confirmation = LocalizedMessageBox.Show(
                 "这会原子清除关机关闭资格并恢复 KeepAt100。不会发送任何 HID 命令。\n\n确定禁用吗？",
                 "禁用关机关闭",
                 MessageBoxButton.YesNo,
@@ -730,7 +730,7 @@ public partial class MainWindow : Window
             if (shutdown is not { Enabled: true, Qualified: true, MatchesCurrentHandle: true })
                 throw new InvalidOperationException("请先完成资格测试并明确启用关机停扇，且确认当前设备句柄匹配。");
 
-            var confirmation = MessageBox.Show(
+            var confirmation = LocalizedMessageBox.Show(
                 "Windows 将开始关机。后台会先恢复并确认风扇安全状态，再执行已启用的关机停扇动作。\n\n" +
                 "如果条件、设备身份或温度不满足，服务会保持风扇运行并放弃停扇。继续吗？",
                 "关机并关闭风扇",

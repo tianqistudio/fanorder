@@ -33,7 +33,7 @@ internal sealed class TrayIcon : IDisposable
         {
             Size = (uint)Marshal.SizeOf<IconData>(), Window = source.Handle, Id = 1,
             Flags = 1 | 2 | 4, Callback = CallbackMessage,
-            Icon = ownedIcon != 0 ? ownedIcon : LoadIcon(0, (nint)32512), Tip = "风序 · V12 Ultra — 正在连接后台",
+            Icon = ownedIcon != 0 ? ownedIcon : LoadIcon(0, (nint)32512), Tip = Localization.Translate("风序 · V12 Ultra — 正在连接后台"),
             Info = "", InfoTitle = "",
         };
         if (!Shell_NotifyIcon(0, ref data))
@@ -57,6 +57,7 @@ internal sealed class TrayIcon : IDisposable
     public void SetText(string text)
     {
         if (disposed) return;
+        text = Localization.Translate(text);
         data.Tip = text.Length > 127 ? text[..127] : text;
         _ = Shell_NotifyIcon(1, ref data);
     }
@@ -65,6 +66,8 @@ internal sealed class TrayIcon : IDisposable
     {
         if (disposed) return;
         // Use a copy so later tooltip updates never replay the notification.
+        title = Localization.Translate(title);
+        message = Localization.Translate(message);
         var notice = data;
         notice.Flags = 0x10; // NIF_INFO
         notice.InfoTitle = title.Length > 63 ? title[..63] : title;

@@ -147,7 +147,7 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             if (args.Handled) return;
-            MessageBox.Show(
+            LocalizedMessageBox.Show(
                 $"设置程序遇到未处理错误：\n\n{args.Exception.Message}",
                 "风序 · FanOrder",
                 MessageBoxButton.OK,

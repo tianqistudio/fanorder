@@ -127,6 +127,11 @@ internal static class Program
             (item.Header as string)?.Contains("More devices", StringComparison.Ordinal) == true),
             "English language switch updates runtime menus");
         Capture("english-home", 0);
+        for (var page = 1; page < 8; page++) Capture("english-page-" + page, page);
+        CapturePage("english-profiles", "profiles");
+        CapturePage("english-general", "general");
+        CapturePage("english-shortcuts", "shortcuts");
+        Capture("english-home-return", 0);
         languageCombo.SelectedIndex = 0;
         Assert(window.Title == "风序 · FanOrder 设置" && Text("PageTitleText") == "控制",
             "switching back restores Simplified Chinese");
@@ -555,6 +560,20 @@ internal static class Program
                     var lastPosition = lastAction.TransformToAncestor(scroll).Transform(new Point(0, 0));
                     Assert(lastPosition.Y >= 0 && lastPosition.Y + lastAction.ActualHeight <= scroll.ActualHeight,
                         "last device shortcut is fully visible at minimum and normal sizes");
+                }
+                if (V12UltraController.Settings.Localization.CurrentLanguage == UiLanguage.English)
+                {
+                    bool IsData(DependencyObject node)
+                    {
+                        for (DependencyObject? current = node; current is not null; current = VisualTreeHelper.GetParent(current))
+                            if (current is TextBox || current is FrameworkElement { Tag: "UserContent" }) return true;
+                        return false;
+                    }
+                    var untranslated = FindVisual<TextBlock>(root).Where(text => text.ActualWidth > 0 && !IsData(text)
+                        && text.Text != "简体中文" && System.Text.RegularExpressions.Regex.IsMatch(text.Text, @"[\u4e00-\u9fff]"))
+                        .Select(text => text.Text).Distinct().ToArray();
+                    File.WriteAllText(Path.Combine(output, scenario + "-untranslated.json"), JsonSerializer.Serialize(untranslated));
+                    Assert(untranslated.Length == 0, "English page has no untranslated UI text: " + scenario + ": " + string.Join(" | ", untranslated));
                 }
                 var bitmap = new RenderTargetBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32);
                 bitmap.Render(root);

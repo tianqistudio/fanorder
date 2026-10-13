@@ -24,6 +24,10 @@ public partial class MainWindow
         }
 
         Localization.Attach(this);
+        UpdateTrayText();
+        ApplyShortcutFilter();
+        if (_profileTitle is not null && SelectedProfileDraft is null)
+            _profileTitle.Text = Localization.Translate("创建你的第一个方案");
         if (navigationReady)
         {
             var page = NavigationPages.SingleOrDefault(item => item.Id == CurrentPageId);

@@ -153,7 +153,7 @@ public partial class MainWindow
     internal async Task ResumeSafetyProtectionAsync()
     {
         if (!CanRequestSafetyOverride || !SafetyProtectionDisabled || _commandInProgress) return;
-        if (!(ConfirmResumeSafetyProtection?.Invoke() ?? MessageBox.Show(this,
+        if (!(ConfirmResumeSafetyProtection?.Invoke() ?? LocalizedMessageBox.Show(this,
             "恢复安全保护后，后台可按保存的控制模式继续温控、满速保护与状态重申。原有硬件或恢复故障仍需单独处理。确认恢复？",
             "恢复安全保护", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)) return;
         await RunCommandAsync(async () =>

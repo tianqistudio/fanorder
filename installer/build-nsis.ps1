@@ -25,6 +25,7 @@ if (Test-Path -LiteralPath $output) { throw 'Build ID already exists; use a new 
 $payload=Join-Path $output 'payload'
 $null=New-Item -ItemType Directory -Path $payload
 foreach ($component in 'service','settings','cli') { Copy-Item -LiteralPath (Join-Path $plan.candidate "publish/$component") -Destination $payload -Recurse }
+foreach ($readme in 'README.md','README.en.md') { Copy-Item -LiteralPath (Join-Path $project $readme) -Destination $payload }
 $licenses=Join-Path $payload 'licenses'; $null=New-Item -ItemType Directory -Path $licenses
 foreach ($license in 'MPL-2.0.txt','Apache-2.0.txt','MIT-DotNet.txt','DotNet-10.0.11-ThirdPartyNotices.txt') {
     Copy-Item -LiteralPath (Join-Path $project "docs/licenses/$license") -Destination $licenses

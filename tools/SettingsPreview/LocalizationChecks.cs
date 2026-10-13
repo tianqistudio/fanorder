@@ -12,7 +12,7 @@ internal static class LocalizationChecks
     {
         var client = new NoDeviceClient();
         var profiles = new MemoryControlProfileStore([
-            new("localization-manual", "本地化回归方案", ControlMode.Manual, 59, FanCurve.RemoteHostSafe, null),
+            new("localization-manual", "保存", ControlMode.Manual, 59, FanCurve.RemoteHostSafe, null),
         ]);
         var language = new MemoryLanguagePreference();
         var window = new MainWindow(client, profileStore: profiles, languagePreference: language);
@@ -49,6 +49,30 @@ internal static class LocalizationChecks
                     $"profile speed continues following slider changes in Chinese in cycle {cycle + 1}");
             }
 
+            var host = new ContentControl();
+            Localization.Attach(host);
+            var content = new Border();
+            host.Content = content;
+            Localization.SetLanguage(UiLanguage.English);
+            Localization.Attach(host);
+            assert(ReferenceEquals(host.Content, content), "localization preserves a visual assigned after an initially empty content property");
+            Localization.Attach(window);
+            var title = (TextBlock)typeof(MainWindow).GetField("_profileTitle", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
+            assert(title.Text == "保存", "user profile names are not translated even when identical to a UI label");
+            assert(Localization.Translate("手动目标 67% 已确认。") == "Manual target 67% confirmed.", "dynamic speed status translates without changing its value");
+            assert(Localization.Translate("“保存”已应用并完成验证。") == "“保存” applied and verified.", "profile name inside complete status template stays verbatim");
+            assert(Localization.Translate("语言已切换，但无法保存语言偏好；下次可能恢复默认。") == "Language changed, but the preference could not be saved; the default may return next time.", "language preference failure is localized");
+            assert(Localization.Translate("安全保护已禁用：后台不会因温度或故障自动开扇。明确恢复保护后才会恢复自动控制。").StartsWith("Safety protection disabled:", StringComparison.Ordinal), "safety state has an English explanation");
+            typeof(MainWindow).GetField("shortcutSearch", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(window, "Fan target");
+            typeof(MainWindow).GetMethod("ApplyShortcutFilter", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, null);
+            var rows = (System.Collections.Generic.Dictionary<string, System.Windows.FrameworkElement>)typeof(MainWindow)
+                .GetField("shortcutRowViews", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
+            assert(rows["fan.increase"].Visibility == System.Windows.Visibility.Visible
+                && rows["window.toggle"].Visibility == System.Windows.Visibility.Collapsed,
+                "shortcut search accepts visible English action labels");
+            typeof(MainWindow).GetField("shortcutSearch", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(window, "");
+            Localization.SetLanguage(UiLanguage.SimplifiedChinese);
+            Localization.Attach(window);
             assert(profiles.Load().Single().ManualSpeedPercent == 59 && client.Requests == 0,
                 "localization and slider draft checks neither save a profile nor send IPC");
             assert(language.Saves == 4 && language.Load() == UiLanguage.SimplifiedChinese,

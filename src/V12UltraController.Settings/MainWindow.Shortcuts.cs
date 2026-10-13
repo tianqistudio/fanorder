@@ -155,12 +155,14 @@ public partial class MainWindow
         grid.RowDefinitions.Add(new() { Height = GridLength.Auto });
         var name = new TextBlock { Text = action.Name, VerticalAlignment = VerticalAlignment.Center,
             TextTrimming = TextTrimming.CharacterEllipsis, ToolTip = ShortcutActionHelp(action), Margin = new(0, 0, 10, 0) };
+        if (action.Id.StartsWith("profile:", StringComparison.Ordinal)) name.Tag = "UserContent";
+        var accessibleName = action.Id.StartsWith("profile:", StringComparison.Ordinal) ? "“" + action.Name + "”" : action.Name;
         name.ToolTipOpening += (_, _) => name.ToolTip = ShortcutActionHelp(action);
         grid.Children.Add(name);
         var record = new Button { Margin = new(0, 0, 10, 0), MinHeight = 36, ToolTip = ShortcutActionHelp(action) + "\n点击录入；Esc 取消，Delete 清除。" };
         record.ToolTipOpening += (_, _) => record.ToolTip = ShortcutActionHelp(action) + "\n点击录入；Esc 取消，Delete 清除。";
         record.SetResourceReference(StyleProperty, "KeycapButtonStyle");
-        AutomationProperties.SetName(record, action.Name + "快捷键");
+        AutomationProperties.SetName(record, accessibleName + "快捷键");
         record.Click += (_, _) => BeginShortcutRecording(action.Id);
         record.LostKeyboardFocus += (_, _) => { if (recordingShortcutId == action.Id) EndShortcutRecording(); };
         Grid.SetColumn(record, 1); grid.Children.Add(record);
@@ -169,7 +171,7 @@ public partial class MainWindow
             ToolTip = action.Scope == ShortcutScopePolicy.RequiredGlobal ? "此动作始终使用全局快捷键。" :
                 action.Scope == ShortcutScopePolicy.LocalOnly ? "此动作仅在窗口内生效。" : "勾选后，窗口隐藏时仍可使用；需包含 Ctrl 或 Alt。" };
         ToolTipService.SetShowOnDisabled(global, true);
-        AutomationProperties.SetName(global, action.Name + "全局开关");
+        AutomationProperties.SetName(global, accessibleName + "全局开关");
         global.Click += (_, _) =>
         {
             EndShortcutRecording();
@@ -179,9 +181,9 @@ public partial class MainWindow
         Grid.SetColumn(global, 2); grid.Children.Add(global);
         var more = new Button { Content = "⋯", Padding = new(8, 7, 8, 7), ToolTip = "快捷键操作" };
         more.SetResourceReference(StyleProperty, "CompactActionButtonStyle");
-        AutomationProperties.SetName(more, action.Name + "快捷键操作");
+        AutomationProperties.SetName(more, accessibleName + "快捷键操作");
         var clear = new MenuItem { Header = "清除快捷键", ToolTip = "清除此动作的快捷键。" };
-        AutomationProperties.SetName(clear, "清除" + action.Name + "快捷键");
+        AutomationProperties.SetName(clear, "清除" + accessibleName + "快捷键");
         clear.Click += (_, _) =>
         {
             EndShortcutRecording();
@@ -231,7 +233,7 @@ public partial class MainWindow
             if (!shortcutRowViews.TryGetValue(action.Id, out var view)) continue;
             var chord = shortcutManager.Bindings[action.Id].Chord;
             var match = (!shortcutsBoundOnly || chord is not null) && (query.Length == 0 ||
-                (action.Name + " " + action.Group + " " + FormatShortcut(chord)).Contains(query, StringComparison.OrdinalIgnoreCase));
+                (action.Name + " " + action.Group + " " + Localization.Translate(action.Name) + " " + Localization.Translate(action.Group) + " " + FormatShortcut(chord)).Contains(query, StringComparison.OrdinalIgnoreCase));
             // Keep an active capture visible until it completes or is cancelled.
             match |= recordingShortcutId == action.Id;
             view.Visibility = match ? Visibility.Visible : Visibility.Collapsed;

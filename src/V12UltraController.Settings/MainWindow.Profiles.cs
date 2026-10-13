@@ -118,6 +118,7 @@ public partial class MainWindow
         var help = ProfileInfo("方案保存在本机。保存风扇模式、手动速度和曲线，可选灯光；不保存停扇、纯手动、释放、接管或关机策略。");
         _profileTitle = new TextBlock { Text = "选择或创建方案", FontSize = 24, FontWeight = FontWeights.SemiBold,
             VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis };
+        _profileTitle.Tag = "UserContent";
         _profileTitle.SetBinding(ToolTipProperty, new Binding(nameof(TextBlock.Text)) { Source = _profileTitle });
         var more = new Button { Content = "⋯", ToolTip = "方案操作", Margin = new Thickness(8, 0, 0, 0) };
         more.SetResourceReference(StyleProperty, "CompactActionButtonStyle");
@@ -242,6 +243,7 @@ public partial class MainWindow
         {
             var text = new FrameworkElementFactory(typeof(TextBlock));
             text.SetBinding(TextBlock.TextProperty, new Binding(property));
+            if (property == nameof(ProfileListEntry.Label)) text.SetValue(TagProperty, "UserContent");
             text.SetValue(TextBlock.FontSizeProperty, size);
             text.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
             text.SetValue(MarginProperty, new Thickness(0, 0, 0, 4));
@@ -326,7 +328,7 @@ public partial class MainWindow
         _renderingProfile = true;
         try
         {
-            _profileTitle!.Text = draft?.Name ?? "创建你的第一个方案";
+            _profileTitle!.Text = draft?.Name ?? Localization.Translate("创建你的第一个方案");
             _profileEditor!.IsEnabled = draft is not null;
             if (draft is not null)
             {
@@ -648,7 +650,7 @@ public partial class MainWindow
     }
 
     private bool ConfirmProfile(string message) => ConfirmProfileAction?.Invoke(message) ??
-        MessageBox.Show(this, message, "风序 · 方案", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
+        LocalizedMessageBox.Show(this, message, "风序 · 方案", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
 
     private string? ShowProfileNameDialog(string currentName)
     {
@@ -669,6 +671,7 @@ public partial class MainWindow
         actions.Children.Add(cancel); actions.Children.Add(save); panel.Children.Add(actions);
         dialog.Content = panel;
         dialog.Loaded += (_, _) => { input.Focus(); input.SelectAll(); };
+        Localization.Attach(dialog);
         return dialog.ShowDialog() == true ? input.Text : null;
     }
 

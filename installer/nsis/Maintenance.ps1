@@ -2,7 +2,11 @@
 [CmdletBinding()]
 param([ValidateSet('Install','Uninstall')][string]$Mode,
       [string]$Payload, [ValidateSet(0,1)][int]$Desktop=1,
-      [ValidateSet(0,1)][int]$StartMenu=1, [switch]$LoadFunctionsOnly)
+      [ValidateSet(0,1)][int]$StartMenu=1, [switch]$LoadFunctionsOnly, [ValidateSet(1033,2052)][int]$Language=2052)
+function Get-InstallerText([string]$Chinese,[string]$English) {
+    if ($Language -eq 1033) { return $English }
+    return $Chinese
+}
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 
@@ -67,7 +71,7 @@ function Wait-ServiceProcessStopped([int[]]$ProcessIds,[int]$TimeoutSeconds=30) 
         $alive=@($tracked | Where-Object { Get-Process -Id $_ -ErrorAction SilentlyContinue })
         if (-not $alive.Count) { return }
         if ([DateTime]::UtcNow -ge $deadline) {
-            throw "后台服务进程仍未退出（PID $($alive -join ',')），无法安全替换服务文件。请退出占用程序后重试。"
+            throw (Get-InstallerText "后台服务进程仍未退出（PID $($alive -join ',')），无法安全替换服务文件。请退出占用程序后重试。" "The backend service process has not exited (PID $($alive -join ',')); service files cannot be safely replaced. Exit the process and retry.")
         }
         Start-Sleep -Milliseconds 250
     }
@@ -82,11 +86,11 @@ function Wait-FileAvailable([string]$Path,[int]$TimeoutSeconds=30) {
             return
         } catch [IO.IOException] {
             if ([DateTime]::UtcNow -ge $deadline) {
-                throw "文件仍被其他进程占用，无法安全替换：$Path。请退出占用程序后重试。"
+                throw (Get-InstallerText "文件仍被其他进程占用，无法安全替换：$Path。请退出占用程序后重试。" "File is still in use and cannot be safely replaced: $Path. Exit the process and retry.")
             }
             Start-Sleep -Milliseconds 250
         } catch [UnauthorizedAccessException] {
-            throw "没有权限访问待替换文件：$Path。"
+            throw (Get-InstallerText "没有权限访问待替换文件：$Path。" "Access denied to the file being replaced: $Path.")
         }
     }
 }
@@ -100,7 +104,7 @@ function Get-OwnedService {
 }
 function Assert-SettingsClosed {
     $processes=@(Get-CimInstance Win32_Process -Filter "Name='V12UltraController.Settings.exe' OR Name='v12ctl.exe'")
-    if ($processes.Count) { throw '请先从托盘菜单退出风序，并关闭 v12ctl，然后重试。' }
+    if ($processes.Count) { throw (Get-InstallerText '请先从托盘菜单退出风序，并关闭 v12ctl，然后重试。' 'Exit FanOrder from the tray and close v12ctl, then retry.') }
 }
 function Get-ShortcutPaths {
     return @((Join-Path ([Environment]::GetFolderPath('CommonDesktopDirectory')) '风序 · FanOrder.lnk'),
@@ -163,12 +167,12 @@ function Assert-InstallIdentity([string]$EnrolledSid) {
     $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
     if ($sid -notmatch '^S-1-5-21-\d+-\d+-\d+-\d+$|^S-1-12-1-\d+-\d+-\d+-\d+$') { throw 'A specific interactive Windows user is required.' }
     if ($EnrolledSid) {
-        if ($sid -ne $EnrolledSid) { throw '请使用首次安装时登记的 Windows 用户运行安装或卸载；不会替换已有用户登记。' }
+        if ($sid -ne $EnrolledSid) { throw (Get-InstallerText '请使用首次安装时登记的 Windows 用户运行安装或卸载；不会替换已有用户登记。' 'Run setup as the Windows user registered at first installation. Existing user registration will not be replaced.') }
     } else {
         $session=(Get-Process -Id $PID).SessionId
         $shells=@(Get-CimInstance Win32_Process -Filter "Name='explorer.exe' AND SessionId=$session")
         $owners=@($shells | ForEach-Object { (Invoke-CimMethod -InputObject $_ -MethodName GetOwnerSid).Sid } | Select-Object -Unique)
-        if ($owners.Count -ne 1 -or $owners[0] -ne $sid) { throw '请在本人 Windows 桌面运行安装器，并用同一账户确认 UAC；不支持借用其他管理员账户安装。' }
+        if ($owners.Count -ne 1 -or $owners[0] -ne $sid) { throw (Get-InstallerText '请在本人 Windows 桌面运行安装器，并用同一账户确认 UAC；不支持借用其他管理员账户安装。' 'Run setup from your own Windows desktop and approve UAC with the same account. Installation using another administrator account is not supported.') }
     }
     return $sid
 }
@@ -184,7 +188,7 @@ function ConvertTo-InstallerVersion([string]$Value) {
 }
 function Assert-NoDowngrade([string]$InstalledVersion,[string]$PackageVersion) {
     if ((ConvertTo-InstallerVersion $InstalledVersion) -gt (ConvertTo-InstallerVersion $PackageVersion)) {
-        throw "已安装较新版本（$InstalledVersion），不能安装旧版本（$PackageVersion）。"
+        throw (Get-InstallerText "已安装较新版本（$InstalledVersion），不能安装旧版本（$PackageVersion）。" "A newer version ($InstalledVersion) is installed; cannot install older version ($PackageVersion).")
     }
 }
 function Assert-InstallPrerequisites($Enrolled,$Manifest) {
@@ -192,11 +196,11 @@ function Assert-InstallPrerequisites($Enrolled,$Manifest) {
         $_.PSObject.Properties['WindowsInstaller'] -and $_.WindowsInstaller -eq 1 -and
         $_.PSObject.Properties['DisplayName'] -and $_.DisplayName -match 'FanOrder|V12 Ultra Controller'
     })
-    if ($msiProducts.Count) { throw '检测到 MSI 管理的安装，请先通过其卸载程序安全卸载；本 EXE 不覆盖 MSI 的组件登记。' }
+    if ($msiProducts.Count) { throw (Get-InstallerText '检测到 MSI 管理的安装，请先通过其卸载程序安全卸载；本 EXE 不覆盖 MSI 的组件登记。' 'An MSI-managed installation was detected. Safely uninstall it first; this EXE will not overwrite MSI component registration.') }
     if (-not $Enrolled) {
         $pawn=Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PawnIO' -ErrorAction SilentlyContinue
-        if (-not $pawn -or $pawn.DisplayVersion -ne '2.2.0.0') { throw '首次安装需要官方签名版 PawnIO 2.2.0（pawnio.eu）。安装器不包含或自动安装驱动。' }
-        if (Test-Path -LiteralPath $script:DataRoot) { throw '检测到未登记的旧数据；请先恢复用户登记，避免误接管旧配置。' }
+        if (-not $pawn -or $pawn.DisplayVersion -ne '2.2.0.0') { throw (Get-InstallerText '首次安装需要官方签名版 PawnIO 2.2.0（pawnio.eu）。安装器不包含或自动安装驱动。' 'First installation requires the officially signed PawnIO 2.2.0 (pawnio.eu). Setup does not bundle or automatically install drivers.') }
+        if (Test-Path -LiteralPath $script:DataRoot) { throw (Get-InstallerText '检测到未登记的旧数据；请先恢复用户登记，避免误接管旧配置。' 'Unregistered existing data was found. Restore user registration first to avoid taking over old configuration.') }
     }
     $installedExe=Join-Path $script:InstallRoot 'service\V12UltraController.Service.exe'
     if (Test-Path -LiteralPath $installedExe) {
@@ -286,7 +290,7 @@ function Invoke-Install {
         Write-InstallRegistry $manifest.version
         if (-not $service -or $service.State -eq 'Running') { Set-ServiceRunning $true }
         'committed' | Set-Content (Join-Path $backup 'result.txt') -Encoding UTF8
-        Write-Host '安装完成。配置和登录托盘偏好已保留；首次安装请从开始菜单打开设置完成接管。'
+        Write-Host (Get-InstallerText '安装完成。配置和登录托盘偏好已保留；首次安装请从开始菜单打开设置完成接管。' 'Installation completed. Configuration and login tray preferences retained. On first use, open Settings from the Start menu to commission the device.')
     } catch {
         $failure=$_
         try {
@@ -298,8 +302,8 @@ function Invoke-Install {
             # by the same user without silently assigning the data to another account.
             if ($service -and $service.State -eq 'Running') { Set-ServiceRunning $true }
             'rolled back; retained data and backup for inspection' | Set-Content (Join-Path $backup 'result.txt') -Encoding UTF8
-        } catch { throw "安装失败：$failure；自动回滚未完成：$_。恢复资料：$backup" }
-        throw "安装失败，程序文件已回滚；保留数据与恢复资料：$backup。$failure"
+        } catch { throw (Get-InstallerText "安装失败：$failure；自动回滚未完成：$_。恢复资料：$backup" "Installation failed: $failure; automatic rollback incomplete: $_. Recovery data: $backup") }
+        throw (Get-InstallerText "安装失败，程序文件已回滚；保留数据与恢复资料：$backup。$failure" "Installation failed; application files rolled back. Data and recovery material retained: $backup. $failure")
     }
 }
 function Invoke-Uninstall {
@@ -309,13 +313,13 @@ function Invoke-Uninstall {
     Assert-SettingsClosed
     $manifest=Read-Manifest $script:InstallRoot
     $service=Get-OwnedService
-    if (-not $service) { throw '后台服务缺失，请先重新安装修复，再卸载。配置和恢复资料已保留。' }
+    if (-not $service) { throw (Get-InstallerText '后台服务缺失，请先重新安装修复，再卸载。配置和恢复资料已保留。' 'Backend service missing. Reinstall to repair before uninstalling. Configuration and recovery data retained.') }
     Set-ServiceRunning $true
     # The enrolled user uses the normal attended API, never the LocalSystem-only installer flag.
     try { Invoke-Checked (Join-Path $script:InstallRoot 'cli\v12ctl.exe') @('commission','rollback','--attended','--start-mythcool','false') }
     catch {
         if ($service.State -ne 'Running') { Set-ServiceRunning $false }
-        throw "接管恢复未通过，卸载已停止，后台和文件均保留。$_"
+        throw (Get-InstallerText "接管恢复未通过，卸载已停止，后台和文件均保留。$_" "Ownership recovery failed; uninstall stopped. Backend and files retained. $_")
     }
     Set-ServiceRunning $false
     # Do all potentially failing file/shortcut operations before deleting the service.
@@ -329,11 +333,11 @@ function Invoke-Uninstall {
         foreach ($shortcut in $shortcuts) { Set-OwnedShortcut $shortcut $false }
         foreach ($path in $paths) { Remove-Item -LiteralPath $path -Force }
         Invoke-Checked $script:Sc @('delete',$script:ServiceName)
-    } catch { Restore-FileSnapshot $snapshot; throw "卸载未完成，文件已恢复；接管已撤回。$_" }
+    } catch { Restore-FileSnapshot $snapshot; throw (Get-InstallerText "卸载未完成，文件已恢复；接管已撤回。$_" "Uninstallation incomplete; files restored and ownership released. $_") }
     Complete-UninstallRegistry
     Remove-Item -LiteralPath (Join-Path $script:InstallRoot 'payload.json')
     # Enrollment, shortcut preferences, ProgramData and exact recovery backups survive uninstall.
-    Write-Host '卸载完成；配置、用户登记、审计和恢复备份已保留。'
+    Write-Host (Get-InstallerText '卸载完成；配置、用户登记、审计和恢复备份已保留。' 'Uninstallation completed; configuration, user registration, audit records and recovery backups retained.')
 }
 function Complete-UninstallRegistry {
     $run='HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
@@ -345,10 +349,10 @@ function Complete-UninstallRegistry {
 
 if ($LoadFunctionsOnly) { return }
 try {
-    if (-not [Environment]::Is64BitProcess -or [Environment]::OSVersion.Version.Build -lt 17763) { throw '需要 Windows 10/11 x64 build 17763 或更高版本。' }
-    if ((Get-CimInstance Win32_OperatingSystem).ProductType -ne 1) { throw '仅支持 Windows 工作站版本。' }
+    if (-not [Environment]::Is64BitProcess -or [Environment]::OSVersion.Version.Build -lt 17763) { throw (Get-InstallerText '需要 Windows 10/11 x64 build 17763 或更高版本。' 'Windows 10/11 x64 build 17763 or later is required.') }
+    if ((Get-CimInstance Win32_OperatingSystem).ProductType -ne 1) { throw (Get-InstallerText '仅支持 Windows 工作站版本。' 'Only Windows workstation editions are supported.') }
     $principal=New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw '需要管理员权限。' }
+    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw (Get-InstallerText '需要管理员权限。' 'Administrator privileges are required.') }
     $script:InstallRoot=Join-Path $env:ProgramFiles 'tianqistudio\V12UltraController'
     $script:DataRoot=Join-Path $env:ProgramData 'TianqiStudio\V12UltraController'
     $script:ServiceName='TianqiStudio.V12UltraController'
@@ -358,7 +362,7 @@ try {
     $script:UninstallKey='HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\FanOrder.NSIS'
     Assert-NoReparse $script:InstallRoot; Assert-NoReparse $script:DataRoot
     $mutex=New-Object Threading.Mutex($false,'Global\TianqiStudio.FanOrder.NsisMaintenance')
-    if (-not $mutex.WaitOne(0)) { throw '另一个安装或卸载正在运行。' }
+    if (-not $mutex.WaitOne(0)) { throw (Get-InstallerText '另一个安装或卸载正在运行。' 'Another installation or uninstallation is running.') }
     try {
         if ($Mode -eq 'Install') { Invoke-Install }
         elseif ($Mode -eq 'Uninstall') { Invoke-Uninstall }

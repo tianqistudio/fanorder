@@ -162,7 +162,7 @@ public partial class MainWindow
     internal bool CurveDraftChanged => curveBaseline is not null && curveBaseline != CurveFingerprint();
     private bool ConfirmCurveReplacement() => !CurveDraftChanged ||
         (ConfirmDraftReplacement?.Invoke("替换未应用的曲线草稿？") ??
-        MessageBox.Show(this, "此操作会替换未应用的曲线草稿。", "替换曲线草稿", MessageBoxButton.YesNo,
+        LocalizedMessageBox.Show(this, "此操作会替换未应用的曲线草稿。", "替换曲线草稿", MessageBoxButton.YesNo,
             MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes);
     private void AcceptCurveBaseline(string? fingerprint = null)
     {

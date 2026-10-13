@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -77,10 +79,37 @@ internal static class Localization
 
     private static readonly ConditionalWeakTable<DependencyObject, ElementState> States = new();
     private static readonly ConditionalWeakTable<DataGridColumn, ColumnState> ColumnStates = new();
-    private static readonly Dictionary<string, string> ChineseToEnglish = CreateTranslations();
+    private static readonly Dictionary<string, string> ChineseToEnglish = LoadTranslations();
     private static readonly Dictionary<string, string> EnglishToChinese = ChineseToEnglish
         .GroupBy(pair => pair.Value, StringComparer.Ordinal)
         .ToDictionary(group => group.Key, group => group.First().Key, StringComparer.Ordinal);
+
+    private sealed record Template(Regex Pattern, string Target, string[] Tokens);
+    private static readonly Template[] Templates = ChineseToEnglish
+        .Where(pair => pair.Key.Contains('{') && Regex.Matches(pair.Key, "\\{").Count == Regex.Matches(pair.Key, "\\}").Count)
+        .Select(pair =>
+        {
+            var tokens = Regex.Matches(pair.Key, @"\{[^{}]+\}").Select(match => match.Value).ToArray();
+            var pattern = Regex.Escape(pair.Key);
+            for (var i = 0; i < tokens.Length; i++) pattern = pattern.Replace(Regex.Escape(tokens[i]), $"(?<v{i}>.*?)");
+            return new Template(new Regex("^" + pattern + "$", RegexOptions.Singleline, TimeSpan.FromMilliseconds(100)), pair.Value, tokens);
+        }).ToArray();
+    private static readonly KeyValuePair<string, string>[] Fragments = BuildFragments();
+    private static KeyValuePair<string, string>[] BuildFragments()
+    {
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var pair in ChineseToEnglish)
+        {
+            // Interpolations containing nested string literals are represented by
+            // their literal spans. Never place C# expressions in display text.
+            var left = Regex.Split(pair.Key, @"\{[^{}]*\}|\{[^}]*$|^[^{]*\}");
+            var right = Regex.Split(pair.Value, @"\{[^{}]*\}|\{[^}]*$|^[^{]*\}");
+            if (left.Length != right.Length) continue;
+            for (var i = 0; i < left.Length; i++)
+                if (left[i].Length >= 2 && Regex.IsMatch(left[i], @"[\u4e00-\u9fff]")) result.TryAdd(left[i], right[i]);
+        }
+        return result.OrderByDescending(pair => pair.Key.Length).ToArray();
+    }
 
     internal static UiLanguage CurrentLanguage { get; private set; } = UiLanguage.SimplifiedChinese;
 
@@ -91,11 +120,26 @@ internal static class Localization
         if (string.IsNullOrEmpty(source) || CurrentLanguage == UiLanguage.SimplifiedChinese)
             return source ?? string.Empty;
         if (ChineseToEnglish.TryGetValue(source, out var translated)) return translated;
-        // Status text often contains a measured value or timestamp. Translate
-        // known fragments while preserving the value supplied by the backend.
-        foreach (var pair in ChineseToEnglish.OrderByDescending(pair => pair.Key.Length))
-            if (pair.Key.Length >= 3 && source.Contains(pair.Key, StringComparison.Ordinal))
-                source = source.Replace(pair.Key, pair.Value, StringComparison.Ordinal);
+        // Match complete status templates before fragments, keeping captured values unchanged.
+        foreach (var template in Templates)
+        {
+            var match = template.Pattern.Match(source);
+            if (!match.Success) continue;
+            var result = template.Target;
+            for (var i = 0; i < template.Tokens.Length; i++)
+                result = result.Replace(template.Tokens[i],
+                    template.Tokens[i].Contains("name", StringComparison.OrdinalIgnoreCase)
+                        || template.Tokens[i].Contains("message", StringComparison.OrdinalIgnoreCase)
+                        ? match.Groups[$"v{i}"].Value : Translate(match.Groups[$"v{i}"].Value), StringComparison.Ordinal);
+            return result;
+        }
+        if (source.Contains('\n')) return string.Join("\n", source.Split('\n').Select(Translate));
+        // Quoted profile names are user content, including names such as 保存.
+        var quoted = new List<string>();
+        source = Regex.Replace(source, "“[^”]*”", match => { quoted.Add(match.Value); return $"\u0001{quoted.Count - 1}\u0002"; });
+        foreach (var pair in Fragments)
+            source = source.Replace(pair.Key, pair.Value, StringComparison.Ordinal);
+        for (var i = 0; i < quoted.Count; i++) source = source.Replace($"\u0001{i}\u0002", quoted[i]);
         return source;
     }
 
@@ -108,6 +152,14 @@ internal static class Localization
     private static void AttachNode(DependencyObject node, HashSet<DependencyObject> visited)
     {
         if (!visited.Add(node)) return;
+        if (node is TextBox || node is FrameworkElement { Tag: "UserContent" })
+        {
+            // User profile names and editable text must survive language changes verbatim.
+            Watch(node, States.GetOrCreateValue(node), AutomationProperties.NameProperty);
+            if (node is TextBlock text && text.ToolTip is string tip && tip != text.Text)
+                Watch(node, States.GetOrCreateValue(node), ToolTipService.ToolTipProperty);
+            return;
+        }
         var state = States.GetOrCreateValue(node);
         foreach (var property in LocalizedProperties(node))
             Watch(node, state, property);
@@ -116,6 +168,9 @@ internal static class Localization
         if (node is ItemsControl items && !state.ItemsHooked)
         {
             state.ItemsHooked = true;
+            // A ComboBox creates its selected-item presenter lazily. Localize
+            // that visual after layout as well as the popup item containers.
+            if (items is ComboBox) items.LayoutUpdated += (_, _) => Attach(items);
             items.ItemContainerGenerator.StatusChanged += (_, _) =>
             {
                 var generated = new HashSet<DependencyObject>();
@@ -151,8 +206,9 @@ internal static class Localization
     {
         if (!state.Sources.ContainsKey(property))
         {
-            var current = node.GetValue(property) as string;
-            if (current is null) return;
+            var value = node.GetValue(property);
+            if (value is not null && value is not string) return;
+            var current = value as string ?? string.Empty;
             state.Sources[property] = SourceFor(current);
             state.Rendered[property] = current;
         }
@@ -192,6 +248,9 @@ internal static class Localization
 
     private static void Apply(DependencyObject node, ElementState state, DependencyProperty property)
     {
+        // Content can change from null/text to a control after initialization.
+        // Never replace a newly assigned visual with a cached string.
+        if (node.GetValue(property) is not null and not string) return;
         if (!state.Sources.TryGetValue(property, out var source)) return;
         var localized = Translate(source);
         state.Rendered[property] = localized;
@@ -238,6 +297,14 @@ internal static class Localization
         catch (InvalidOperationException) { }
         for (var i = 0; i < count; i++)
             yield return VisualTreeHelper.GetChild(node, i);
+    }
+
+    private static Dictionary<string, string> LoadTranslations()
+    {
+        var result = CreateTranslations();
+        using var stream = typeof(Localization).Assembly.GetManifestResourceStream("V12UltraController.Settings.Strings.en.json")!;
+        foreach (var pair in JsonSerializer.Deserialize<Dictionary<string, string>>(stream)!) result[pair.Key] = pair.Value;
+        return result;
     }
 
     private static Dictionary<string, string> CreateTranslations() => new(StringComparer.Ordinal)

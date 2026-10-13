@@ -157,7 +157,7 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel>
                                         <TextBlock Text="已保存方案" Style="{StaticResource CaptionStyle}" Margin="0,0,0,8" />
-                                        <ComboBox x:Name="OverviewProfileCombo" DisplayMemberPath="Name" SelectedValuePath="Id" MinWidth="160" MaxWidth="280" HorizontalAlignment="Left" AutomationProperties.Name="选择已保存方案" />
+                                        <ComboBox x:Name="OverviewProfileCombo" Tag="UserContent" DisplayMemberPath="Name" SelectedValuePath="Id" MinWidth="160" MaxWidth="280" HorizontalAlignment="Left" AutomationProperties.Name="选择已保存方案" />
                                         <TextBlock x:Name="OverviewProfileText" Style="{StaticResource CaptionStyle}" TextWrapping="Wrap" Margin="0,6,10,0" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">

@@ -1,5 +1,7 @@
 # 风序 · FanOrder
 
+简体中文 · [English](README.en.md)
+
 <img src="installer/assets/FanOrder.svg" width="88" alt="FanOrder 图标">
 
 专为绿巨能（llano）V12Ultra（原 V16）AI 智能控温笔记本压风式散热器开发的 Windows 控制工具，提供温控曲线、手动调速、灯光预设与托盘快捷操作。
@@ -37,9 +39,12 @@ V11、V11 Pro、普通 V12 及其他型号不在当前适配范围内。「原 V
 
 ## 安装与使用
 
-Windows x64 安装程序见 [0.1.27 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.27-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
+Windows x64 安装程序见 [0.1.28 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.28-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
 
-本版从当前源码构建，更新内容与验证范围见 [0.1.27 发布说明](docs/release-0.1.27.md)。
+本版从当前源码构建，更新内容与验证范围见 [0.1.28 发布说明](docs/release-0.1.28.md)。
+安装器可选择简体中文或 English，桌面与开始菜单快捷方式独立选择。程序界面在「设置 → 常规」选择语言，即时切换并为当前 Windows 用户保存；方案名称、数值与设备配置不因语言切换而改变。安装器语言与界面语言分别保存。
+
+首次使用时，在有人看护且已退出 Myth.Cool 的条件下按「配对、接管与回滚」完成验证。方案先保存到本机，再明确应用到设备；编辑草稿不会发送设备指令。纯手动会停止自动调节，恢复保护需明确操作。卸载前退出托盘；恢复失败会中止卸载，配置和恢复备份保留。
 
 <a id="从源码构建"></a>
 
