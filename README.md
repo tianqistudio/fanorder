@@ -19,6 +19,12 @@
 
 硬件接管需要显式配对和验证。温度监控依赖 LibreHardwareMonitor；目标机器可能需要单独安装 PawnIO。仓库不附带厂商软件、固件或驱动安装包。
 
+## 下载与安装
+
+Windows x64 安装程序见 [0.1.25 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.25-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。安装包未签名，尚未完成完整安装、升级及卸载验收。
+
+此安装包基于 0.1.25，不包含后续 0.1.26 界面补丁及当前源码的可靠性改进；下列构建命令针对当前源码。
+
 ## 从源码构建
 
 安装与 `global.json` 匹配的 .NET 10 SDK，在 Windows x64 上运行：
@@ -41,7 +47,7 @@ dotnet test tests/TianqiStudio.DesktopShortcuts.Tests/TianqiStudio.DesktopShortc
 
 首次运行需完成服务安装与有人看护的设备配对。不要让多个控制程序同时写入同一设备。风扇关闭需要明确确认；关机停扇另有独立资格验证与启用流程，默认不启用。
 
-本仓库首次发布当前源码，不提供与本次源码对应的安装包。安装器源码见 [installer](installer/README.md)，验证范围见 [源码发布说明](docs/source-release.md)。
+安装器源码见 [installer](installer/README.md)，当前源码的验证范围见 [源码发布说明](docs/source-release.md)。安装包的版本、校验和及验证边界以对应 Release 为准。
 
 ## 项目结构
 
