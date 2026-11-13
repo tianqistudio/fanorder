@@ -133,7 +133,7 @@ internal static class Program
         CapturePage("english-shortcuts", "shortcuts");
         Capture("english-home-return", 0);
         languageCombo.SelectedIndex = 0;
-        Assert(window.Title == "风序 · FanOrder 设置" && Text("PageTitleText") == "控制",
+        Assert(window.Title == "风序 FanOrder 设置" && Text("PageTitleText") == "控制",
             "switching back restores Simplified Chinese");
         Assert(language.Saves == 2 && language.Language == UiLanguage.SimplifiedChinese,
             "language preference is saved through the injected store");

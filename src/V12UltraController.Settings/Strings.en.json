@@ -1,4 +1,5 @@
 {
+  "由 tianqistudio 制作。": "Made by tianqistudio.",
   "设置程序遇到未处理错误：\n\n{args.Exception.Message}": "The settings app encountered an unhandled error:\n\n{args.Exception.Message}",
   "Windows 未创建后台启动请求。": "Windows did not create a backend startup request.",
   "Windows 启动后台失败（{process.ExitCode}）；请确认程序已完整安装，服务没有被禁用。": "Windows could not start the backend ({process.ExitCode}). Check that the app is fully installed and the service is enabled.",
@@ -500,7 +501,7 @@
   "服务将备份并禁用 \\Myth.Cool 计划任务，然后成为散热器的唯一写入者。\n\n确定正式接管吗？": "The service will back up and disable the \\Myth.Cool scheduled task, then become the cooler's sole writer.\n\nCommission now?",
   "确认接管": "Confirm commissioning",
   "正式接管已完成。": "Commissioning completed.",
-  "风序 · FanOrder 已成为唯一写入者。": "FanOrder is now the sole writer.",
+  "风序 FanOrder 已成为唯一写入者。": "FanOrder is now the sole writer.",
   "尚未取得服务状态；界面不会在无法确认强制卸载恢复状态时执行回滚。": "Service status unavailable; rollback is blocked while forced-uninstall recovery status cannot be confirmed.",
   "强制卸载恢复标记无法验证；界面不会删除或绕过该标记。": "The forced-uninstall recovery marker cannot be verified; the UI will neither delete nor bypass it.",
   "强制卸载恢复前必须显式勾选“我在电脑旁并会观察设备”。": "Before forced-uninstall recovery, explicitly check “I am at the computer and will observe the device”.",

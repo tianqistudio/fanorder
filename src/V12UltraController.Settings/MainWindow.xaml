@@ -1,4 +1,4 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="V12UltraController.Settings.MainWindow" Title="风序 · FanOrder 设置" Width="1200" Height="820" MinWidth="980" MinHeight="680" WindowStartupLocation="CenterScreen" Background="{DynamicResource WindowBrush}" FontFamily="Segoe UI Variable, Segoe UI, Microsoft YaHei UI">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="V12UltraController.Settings.MainWindow" Title="风序 FanOrder 设置" Width="1200" Height="820" MinWidth="980" MinHeight="680" WindowStartupLocation="CenterScreen" Background="{DynamicResource WindowBrush}" FontFamily="Segoe UI Variable, Segoe UI, Microsoft YaHei UI">
     <Grid x:Name="WindowLayoutGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="184" x:Name="NavigationColumn" />
@@ -16,7 +16,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Tag="device">
-                    <TextBlock Text="风序 · FanOrder" FontSize="21" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Text="风序 FanOrder" FontSize="21" FontWeight="SemiBold" VerticalAlignment="Center" />
                     <Button x:Name="DeviceSwitchButton" Content="llano V12Ultra  ▾" HorizontalAlignment="Left" Margin="20,0,0,0" Style="{StaticResource SecondaryButtonStyle}" AutomationProperties.Name="切换设备型号" Click="DeviceSwitchButton_Click" ToolTip="仅适配绿巨能 V12Ultra（原 V16）AI 智控款；选择不等于已连接。" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Tag="connection">
@@ -857,8 +857,8 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="制作者" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,24,10" />
-                                    <TextBlock Grid.Column="1" Text="tianqistudio" FontWeight="SemiBold" Margin="0,0,0,10" />
+                                    
+                                    <TextBlock Grid.ColumnSpan="2" Text="由 tianqistudio 制作。" FontWeight="SemiBold" Margin="0,0,0,10" />
                                     <TextBlock Grid.Row="1" Text="官网" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,24,0" />
                                     <TextBlock Grid.Row="1" Grid.Column="1">
                                         <Hyperlink Click="OpenOfficialWebsite_Click" Foreground="{DynamicResource PrimaryBrush}" ToolTip="在浏览器中打开官网" AutomationProperties.Name="打开官网 tianqistudio.com">tianqistudio.com</Hyperlink>

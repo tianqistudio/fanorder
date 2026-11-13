@@ -10,7 +10,7 @@ public partial class MainWindow
     {
         try
         {
-            using var browser = Process.Start(new ProcessStartInfo("https://tianqistudio.com")
+            using var browser = Process.Start(new ProcessStartInfo("https://tianqistudio.com/home")
             {
                 UseShellExecute = true,
             });

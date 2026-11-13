@@ -149,7 +149,7 @@ public partial class App : Application
             if (args.Handled) return;
             LocalizedMessageBox.Show(
                 $"设置程序遇到未处理错误：\n\n{args.Exception.Message}",
-                "风序 · FanOrder",
+                "风序 FanOrder",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             args.Handled = true;

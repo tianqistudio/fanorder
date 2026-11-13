@@ -77,7 +77,7 @@ public partial class MainWindow : Window
         var language = _languagePreference?.Load() ?? UiLanguage.SimplifiedChinese;
         LanguageCombo.SelectedIndex = language == UiLanguage.English ? 1 : 0;
         Localization.SetLanguage(language);
-        Title = Localization.Translate("风序 · FanOrder 设置");
+        Title = Localization.Translate("风序 FanOrder 设置");
         ApplyAppearance();
         appearanceReady = true;
         DataContext = this;
@@ -502,7 +502,7 @@ public partial class MainWindow : Window
             await SendCheckedAsync(PipeOperations.CommissionCommit, new { attended = true, sessionId });
             ResetCommissionSession();
             CommitResultText.Text = "正式接管已完成。";
-            ActivityText.Text = "风序 · FanOrder 已成为唯一写入者。";
+            ActivityText.Text = "风序 FanOrder 已成为唯一写入者。";
         }, refreshAfterSuccess: true);
 
     private async void RollbackButton_Click(object sender, RoutedEventArgs e) =>

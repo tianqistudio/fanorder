@@ -13,7 +13,7 @@ public partial class MainWindow
         if (!languageReady || LanguageCombo is null) return;
         var language = LanguageCombo.SelectedIndex == 1 ? UiLanguage.English : UiLanguage.SimplifiedChinese;
         Localization.SetLanguage(language);
-        Title = Localization.Translate("风序 · FanOrder 设置");
+        Title = Localization.Translate("风序 FanOrder 设置");
         try
         {
             _languagePreference?.Save(language);

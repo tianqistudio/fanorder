@@ -309,8 +309,8 @@ internal static class Localization
 
     private static Dictionary<string, string> CreateTranslations() => new(StringComparer.Ordinal)
     {
-        ["风序 · FanOrder 设置"] = "FanOrder Settings",
-        ["风序 · FanOrder"] = "FanOrder",
+        ["风序 FanOrder 设置"] = "FanOrder Settings",
+        ["风序 FanOrder"] = "FanOrder",
         ["本地服务已连接"] = "Connected",
         ["本地服务不可用"] = "Unavailable",
         ["当前适配 V12 Ultra；重新选择不会调速、重新配对或接管设备。"] = "V12 Ultra selected; changing this does not adjust speed, pair again or commission the device.",
