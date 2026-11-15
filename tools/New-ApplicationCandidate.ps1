@@ -13,7 +13,8 @@ if(Test-Path -LiteralPath $candidate){throw 'Candidate is immutable; use a new i
 function Get-SourceIdentity {
  $files=foreach($folder in @('src','tests','tools','installer')) {
   Get-ChildItem -LiteralPath (Join-Path $project $folder) -File -Recurse | Where-Object {
-   $_.FullName -notmatch '[\\/](bin|obj|artifacts)[\\/]' -and $_.Extension -in @('.cs','.xaml','.csproj','.json','.ps1','.psm1','.wxs','.wixproj','.props','.targets','.ico','.svg','.nsi','.nsh')
+   $relativePath=[IO.Path]::GetRelativePath($project,$_.FullName)
+   $relativePath -notmatch '(^|[\\/])(bin|obj|artifacts)([\\/]|$)' -and $_.Extension -in @('.cs','.py','.xaml','.csproj','.json','.ps1','.psm1','.wxs','.wixproj','.props','.targets','.ico','.svg','.nsi','.nsh')
   }
  }
  $files+=Get-ChildItem -LiteralPath $project -File | Where-Object { $_.Extension -in @('.json','.props','.targets','.slnx','.config') }
@@ -79,6 +80,10 @@ try {
   }
  } finally {$archive.Dispose()}
  $zipHash=(Get-FileHash -LiteralPath $zipPath).Hash
+ & python -B (Join-Path $PSScriptRoot 'verify_release_privacy.py') $zipPath `
+  --allow-codeview-fingerprint fed8267010385db424a04f39dfb7dcf22c34a000dcfde21d05e19f2c6fa17598 --allow-codeview-fingerprint 7ef97b960955ffa2b26e1c00f7f335335a69f15d34e2a4a269148777bdc804ac --owned-prefix V12UltraController --owned-prefix v12ctl --owned-prefix TianqiStudio --forbid-prefix $project `
+  --report (Join-Path $candidate 'release-privacy.json') | Out-Host
+ if($LASTEXITCODE -ne 0){throw 'Release privacy verification failed; candidate is not releasable.'}
  [IO.File]::WriteAllText((Join-Path $candidate 'SHA256SUMS.txt'),"$zipHash  $([IO.Path]::GetFileName($zipPath))`n")
  $report=[ordered]@{version=$Version;candidateId=$CandidateId;zip=$zipPath;sha256=$zipHash;entriesVerified=$entries.Count;
   sourceSha256=(Get-FileHash (Join-Path $candidate 'source-inputs.json')).Hash;ui=$ui;tooltip=$tooltip;testsPassed=$testEvidence.passed;testEvidence=$testEvidence;

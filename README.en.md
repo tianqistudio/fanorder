@@ -24,7 +24,7 @@ Device control requires explicit pairing and verification. Temperature monitorin
 
 ## Install and use
 
-Download the **[0.1.28 preview installer](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.28-preview.20261013)** for Windows x64.
+Download the **[0.1.30 preview application package](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.30-preview.20261116)** for Windows x64.
 
 1. Exit FanOrder from the tray before installing. Choose English or Simplified Chinese in the installer. Desktop and Start menu shortcuts are independently selectable; upgrades retain existing choices, user registration, configuration and startup preferences.
 2. Open Settings from a shortcut or the installation folder. Choose the interface language under **Settings → General**. Installer language and interface language are independent.
@@ -39,7 +39,7 @@ Before uninstalling, exit the tray app. The backend releases ownership and resto
 
 ## Build and test
 
-Use the .NET 10 SDK specified by `global.json` and run from the project root on Windows x64:
+Use Python 3.11 or newer and the .NET 10 SDK specified by `global.json` and run from the project root on Windows x64:
 
 ```powershell
 dotnet restore V12UltraController.slnx --locked-mode
@@ -49,13 +49,15 @@ dotnet test tests/TianqiStudio.DesktopShortcuts.Tests/TianqiStudio.DesktopShortc
 dotnet run --project tools/SettingsPreview -c Release -- --output artifacts/preview-new
 ```
 
+Build, publish and pack automatically reject machine-specific paths in project binaries and package contents. Run `python -B tools/test_release_privacy.py` to exercise the privacy gate.
+
 Tests use simulated devices without real HID writes. Build and test commands do not install the service or commission a fan. The UI preview uses synthetic state and does not connect to the production service.
 
 To create a new validated application candidate and NSIS installer, use unique IDs:
 
 ```powershell
-./tools/New-ApplicationCandidate.ps1 -Version 0.1.28 -CandidateId bilingual-0128-new
-./installer/build-nsis.ps1 -CandidateId bilingual-0128-new -BuildId bilingual-0128-new
+./tools/New-ApplicationCandidate.ps1 -Version 0.1.30 -CandidateId privacy-0130-new
+./installer/build-nsis.ps1 -CandidateId privacy-0130-new -BuildId privacy-0130-new
 ```
 
 The packaging workflow checks the retained official NSIS archive and compiler files. The candidate verifies application versions, tests, synthetic UI behavior and package contents. Building an installer does not execute it or verify a real installation, device commissioning or physical cooling performance.

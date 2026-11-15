@@ -39,6 +39,10 @@ $helper=Get-Content (Join-Path $PSScriptRoot 'nsis/Maintenance.ps1') -Raw
 $files=@(Get-ChildItem -LiteralPath $payload -File -Recurse | ForEach-Object {
     @{path=[IO.Path]::GetRelativePath($payload,$_.FullName);sha256=(Get-FileHash -LiteralPath $_.FullName).Hash}
 })
+& python -B (Join-Path $project 'tools/verify_release_privacy.py') $payload `
+    --allow-codeview-fingerprint fed8267010385db424a04f39dfb7dcf22c34a000dcfde21d05e19f2c6fa17598 --allow-codeview-fingerprint 7ef97b960955ffa2b26e1c00f7f335335a69f15d34e2a4a269148777bdc804ac --owned-prefix V12UltraController --owned-prefix v12ctl --owned-prefix TianqiStudio --forbid-prefix $project `
+    --report (Join-Path $output 'payload-privacy.json') | Out-Host
+if ($LASTEXITCODE -ne 0) { throw 'Installer payload privacy verification failed.' }
 @{version=$plan.version;files=$files;candidateZipSha256=$plan.zipSha256} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $payload 'payload.json') -Encoding utf8BOM
 $exe=Join-Path $output "FanOrder-$($plan.version)-Setup.exe"
 & (Join-Path $compilerRoot 'makensis.exe') /NOCONFIG /INPUTCHARSET UTF8 /V3 "/DVERSION=$($plan.version)" "/DPAYLOAD=$payload" "/DOUTPUT=$exe" "/DICON=$icon" (Join-Path $PSScriptRoot 'nsis/FanOrder.nsi') | Tee-Object -FilePath (Join-Path $output 'compiler.log')

@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup>
+    <ReleasePrivacyPython Condition="'$(ReleasePrivacyPython)' == ''">python</ReleasePrivacyPython>
+    <ReleasePrivacyScanner>$(MSBuildThisFileDirectory)tools/verify_release_privacy.py</ReleasePrivacyScanner>
+  </PropertyGroup>
+
+  <Target Name="VerifyBuiltBinaryPrivacy" AfterTargets="Build"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(MSBuildProjectExtension)' == '.csproj' and Exists('$(TargetPath)')">
+    <ItemGroup>
+      <_PrivacyBuildFiles Include="$(TargetPath)" />
+      <_PrivacyBuildFiles Include="$(TargetDir)$(TargetName).pdb" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+    </ItemGroup>
+    <Exec Command="&quot;$(ReleasePrivacyPython)&quot; -B &quot;$(ReleasePrivacyScanner)&quot; @(_PrivacyBuildFiles-&gt;'&quot;%(Identity)&quot;', ' ') --owned-prefix &quot;$(AssemblyName)&quot; --forbid-prefix &quot;$(MSBuildThisFileDirectory.Replace('\','/'))&quot;" />
+  </Target>
+
+  <Target Name="VerifyPublishedBinaryPrivacy" AfterTargets="Publish"
+          Condition="'$(MSBuildProjectExtension)' == '.csproj' and Exists('$(PublishDir)')">
+    <Exec Command="&quot;$(ReleasePrivacyPython)&quot; -B &quot;$(ReleasePrivacyScanner)&quot; &quot;$(PublishDir.Replace('\','/'))&quot; --allow-codeview-fingerprint fed8267010385db424a04f39dfb7dcf22c34a000dcfde21d05e19f2c6fa17598 --allow-codeview-fingerprint 7ef97b960955ffa2b26e1c00f7f335335a69f15d34e2a4a269148777bdc804ac --owned-prefix V12UltraController --owned-prefix v12ctl --owned-prefix TianqiStudio --forbid-prefix &quot;$(MSBuildThisFileDirectory.Replace('\','/'))&quot;" />
+  </Target>
+
+  <Target Name="VerifyPackedBinaryPrivacy" AfterTargets="Pack"
+          Condition="'$(IsPackable)' == 'true' and '$(MSBuildProjectExtension)' == '.csproj'">
+    <PropertyGroup>
+      <_PrivacyPackagePath>$([System.IO.Path]::Combine('$(PackageOutputPath)', '$(PackageId).$(PackageVersion).nupkg'))</_PrivacyPackagePath>
+    </PropertyGroup>
+    <Exec Command="&quot;$(ReleasePrivacyPython)&quot; -B &quot;$(ReleasePrivacyScanner)&quot; &quot;$(_PrivacyPackagePath)&quot; --allow-codeview-fingerprint fed8267010385db424a04f39dfb7dcf22c34a000dcfde21d05e19f2c6fa17598 --allow-codeview-fingerprint 7ef97b960955ffa2b26e1c00f7f335335a69f15d34e2a4a269148777bdc804ac --owned-prefix V12UltraController --owned-prefix v12ctl --owned-prefix TianqiStudio --forbid-prefix &quot;$(MSBuildThisFileDirectory.Replace('\','/'))&quot;" />
+  </Target>
+</Project>

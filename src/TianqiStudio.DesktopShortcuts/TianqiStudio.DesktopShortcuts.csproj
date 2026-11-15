@@ -5,7 +5,7 @@
     <RootNamespace>TianqiStudio.DesktopShortcuts</RootNamespace>
     <IsPackable>true</IsPackable>
     <PackageId>TianqiStudio.DesktopShortcuts</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.2</Version>
     <Authors>tianqistudio</Authors>
     <Description>Reusable shortcut bindings, persistence and injectable registration for Windows desktop applications.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>

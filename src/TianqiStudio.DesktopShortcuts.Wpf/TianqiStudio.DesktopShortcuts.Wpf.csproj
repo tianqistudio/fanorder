@@ -6,7 +6,7 @@
     <RootNamespace>TianqiStudio.DesktopShortcuts.Wpf</RootNamespace>
     <IsPackable>true</IsPackable>
     <PackageId>TianqiStudio.DesktopShortcuts.Wpf</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.2</Version>
     <Authors>tianqistudio</Authors>
     <Description>WPF RegisterHotKey adapter for TianqiStudio.DesktopShortcuts.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>

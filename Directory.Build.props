@@ -8,6 +8,10 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AnalysisLevel>latest</AnalysisLevel>
     <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <!-- Keep compiler paths independent of the developer's machine, including
+         CallerFilePath values and portable PDB document names. -->
+    <PathMap>$(MSBuildThisFileDirectory)=/_/FanOrder/,$(PathMap)</PathMap>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 </Project>

@@ -39,9 +39,9 @@ V11、V11 Pro、普通 V12 及其他型号不在当前适配范围内。「原 V
 
 ## 安装与使用
 
-Windows x64 安装程序见 [0.1.28 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.28-preview.20261013)。安装包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
+Windows x64 应用预览包见 [0.1.30 预发布版](https://github.com/tianqistudio/fanorder/releases/tag/v0.1.30-preview.20261116)。应用包包含 .NET 10 运行时，首次安装需要另行安装官方 PawnIO 2.2.0。
 
-本版从当前源码构建，更新内容与验证范围见 [0.1.28 发布说明](docs/release-0.1.28.md)。
+本版从当前源码构建，更新内容与验证范围见 [0.1.30 发布说明](docs/release-0.1.30.md)。
 安装器可选择简体中文或 English，桌面与开始菜单快捷方式独立选择。程序界面在「设置 → 常规」选择语言，即时切换并为当前 Windows 用户保存；方案名称、数值与设备配置不因语言切换而改变。安装器语言与界面语言分别保存。
 
 首次使用时，在有人看护且已退出 Myth.Cool 的条件下按「配对、接管与回滚」完成验证。方案先保存到本机，再明确应用到设备；编辑草稿不会发送设备指令。纯手动会停止自动调节，恢复保护需明确操作。卸载前退出托盘；恢复失败会中止卸载，配置和恢复备份保留。
@@ -50,7 +50,7 @@ Windows x64 安装程序见 [0.1.28 预发布版](https://github.com/tianqistudi
 
 ## 开发与测试
 
-安装与 `global.json` 匹配的 .NET 10 SDK，在 Windows x64 的项目根目录运行：
+安装与 `global.json` 匹配的 .NET 10 SDK 和 Python 3.11 或更新版本，在 Windows x64 的项目根目录运行：
 
 ```powershell
 dotnet restore V12UltraController.slnx --locked-mode
@@ -69,6 +69,8 @@ dotnet test `
 ```
 
 测试采用模拟设备，不向真实设备发送 HID 写入。构建与测试不会安装服务或接管风扇。
+
+普通 build、publish 和 pack 会检查自有程序集、调试文档和包内文件中的机器绝对路径。发布前可用 `python -B tools/test_release_privacy.py` 运行隐私门禁回归。
 
 ## 使用边界
 

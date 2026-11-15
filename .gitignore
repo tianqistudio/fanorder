@@ -6,6 +6,7 @@
 !/README.en.md
 !/THIRD-PARTY-NOTICES.md
 !/Directory.Build.props
+!/Directory.Build.targets
 !/Directory.Packages.props
 !/global.json
 !/V12UltraController.slnx
@@ -19,6 +20,7 @@
 !/docs/source-release.md
 !/docs/release-0.1.25.md
 !/docs/release-0.1.27.md
+!/docs/release-0.1.30.md
 !/docs/release-0.1.28.md
 /installer/*
 !/installer/assets/
@@ -34,6 +36,9 @@
 !/tools/Test-Evidence.psm1
 !/tools/Test-EvidenceChecks.ps1
 !/tools/New-ApplicationCandidate.ps1
+!/tools/verify_release_privacy.py
+!/tools/test_release_privacy.py
+!/tools/dotnet_static_payloads.py
 **/bin/
 **/obj/
 **/TestResults/
